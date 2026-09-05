@@ -24,8 +24,6 @@ public class NbsAplicavelService {
 
     private final NbsAplicavelRepository repository;
 
-    // TODO: verificar comportamento do cache, algumas vezes o cache permanece ativo 
-    // mesmo após reiniciar a aplicação no perfil offline.
     @Cacheable(cacheNames = "NbsAplicavelService.validarNbsAplicavel",
             key = "#nbs + ':' + #idClassificacaoTributaria + ':' + #data")
     public boolean validarNbsAplicavel(String nbs, Long idClassificacaoTributaria, String codigoClassificacaoTributaria,

@@ -21,8 +21,6 @@ import br.gov.serpro.rtc.api.model.output.dadosabertos.NcmDadosAbertosOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.RedutorCompraGovernamentalDadosAbertosOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.SituacaoTributariaDadosAbertosOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.TipoDfeClassificacaoDadosAbertosOutput;
-import br.gov.serpro.rtc.api.model.output.dadosabertos.NbsAplicavelOutput;
-import br.gov.serpro.rtc.api.model.output.dadosabertos.NcmAplicavelOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.TransferenciaCBSDadosAbertosOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.TransferenciaIBSDadosAbertosOutput;
 import br.gov.serpro.rtc.api.model.output.dadosabertos.UfDadosAbertosOutput;
@@ -48,8 +46,6 @@ import br.gov.serpro.rtc.domain.service.AliquotaAdValoremServicoService;
 import br.gov.serpro.rtc.domain.service.AliquotaPadraoService;
 import br.gov.serpro.rtc.domain.service.ClassificacaoTributariaService;
 import br.gov.serpro.rtc.domain.service.FundamentacaoClassificacaoService;
-import br.gov.serpro.rtc.domain.service.NbsAplicavelService;
-import br.gov.serpro.rtc.domain.service.NcmAplicavelService;
 import br.gov.serpro.rtc.domain.service.MunicipioService;
 import br.gov.serpro.rtc.domain.service.TipoDfeClassificacaoService;
 import br.gov.serpro.rtc.domain.service.TributoSituacaoTributariaService;
@@ -57,8 +53,6 @@ import br.gov.serpro.rtc.domain.service.UfService;
 import br.gov.serpro.rtc.domain.service.exception.ClassificacaoTributariaNaoEncontradaException;
 import br.gov.serpro.rtc.domain.service.exception.ErroGenericoValidacaoException;
 import br.gov.serpro.rtc.domain.service.exception.NbsNaoEncontradaException;
-import br.gov.serpro.rtc.domain.service.exception.NbsNaoVinculadaException;
-import br.gov.serpro.rtc.domain.service.exception.NcmNaoVinculadaException;
 import jakarta.validation.ValidationException;
 import lombok.RequiredArgsConstructor;
 
@@ -87,9 +81,8 @@ public class DadosAbertosService {
     private final FundamentacaoClassificacaoService fundamentacaoClassificacaoService;
     private final TributoSituacaoTributariaService tributoSituacaoTributariaService;
     private final TipoDfeClassificacaoService tipoDfeClassificacaoService;
+
     private final AliquotaPadraoService aliquotaPadraoService;
-    private final NbsAplicavelService nbsAplicavelService;
-    private final NcmAplicavelService ncmAplicavelService;
 
     // FIXME aqui retornar somente os dados necessarios para a consulta via service
     public List<UfDadosAbertosOutput> consultarUfs() {
@@ -514,13 +507,13 @@ public class DadosAbertosService {
             return List.of();
         }
 
-        boolean temVinculo = nbsAplicavelRepository.existeVinculoParaClassificacao(classificacao.id()) == 1;
+        boolean temVinculo = nbsAplicavelRepository.existeVinculoParaClassificacao(cClassTrib) == 1;
         
         if (!temVinculo) {
             return listarNbs(data);
         }
 
-        List<Object[]> results = nbsAplicavelRepository.listarNbsAplicaveisPorClassificacao(classificacao.id(), data);
+        List<Object[]> results = nbsAplicavelRepository.listarNbsAplicaveisPorClassificacao(cClassTrib, data);
 
         return results.stream()
                 .map(row -> NbsListaDadosAbertosOutput.builder()
@@ -551,62 +544,5 @@ public class DadosAbertosService {
         }
         
         return TipoWarningDadosSimulados.CASO_GERAL;
-    }
-
-    public NbsAplicavelOutput validarNbsAplicavel(String cClassTrib, String nbs, LocalDate dataOcorrenciaFatoGerador) {
-        validarNbs(nbs);
-        if (nbs.length() != 9) {
-            throw new ValidationException("O campo NBS deve ter exatamente 9 dígitos.");
-        }
-        var classificacao = classificacaoTributariaService.buscarClassificacaoTributariaCbsIbs(cClassTrib, dataOcorrenciaFatoGerador);
-        boolean valido;
-
-        try {
-            valido = nbsAplicavelService.validarNbsAplicavel(
-                nbs,
-                classificacao.id(),
-                cClassTrib,
-                dataOcorrenciaFatoGerador,
-                "CBS e IBS"
-            );
-        } catch (NbsNaoVinculadaException e) {
-            valido = false;
-        }
-
-        return NbsAplicavelOutput.builder()
-            .cClassTrib(cClassTrib)
-            .nbs(nbs)
-            .dataOcorrenciaFatoGerador(dataOcorrenciaFatoGerador.toString())
-            .valido(valido)
-            .build();
-    }
-
-    public NcmAplicavelOutput validarNcmAplicavel(String cClassTrib, String ncm, LocalDate dataOcorrenciaFatoGerador) {
-        validarNcm(ncm);
-        if (ncm.length() != 8) {
-            throw new ValidationException("O campo NCM deve ter exatamente 8 dígitos.");
-        }
-
-        var classificacao = classificacaoTributariaService.buscarClassificacaoTributariaCbsIbs(cClassTrib, dataOcorrenciaFatoGerador);
-        boolean valido;
-
-        try {
-            valido = ncmAplicavelService.validarNcmAplicavel(
-                ncm,
-                classificacao.id(),
-                cClassTrib,
-                dataOcorrenciaFatoGerador,
-                "CBS e IBS"
-            );
-        } catch (NcmNaoVinculadaException e) {
-            valido = false;
-        }
-
-        return NcmAplicavelOutput.builder()
-            .cClassTrib(cClassTrib)
-            .ncm(ncm)
-            .dataOcorrenciaFatoGerador(dataOcorrenciaFatoGerador.toString())
-            .valido(valido)
-            .build();
     }
 }

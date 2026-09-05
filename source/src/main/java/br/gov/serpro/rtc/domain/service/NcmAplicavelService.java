@@ -23,9 +23,7 @@ import lombok.RequiredArgsConstructor;
 public class NcmAplicavelService {
 
     private final NcmAplicavelRepository repository;
-    
-    // TODO: verificar comportamento do cache, algumas vezes o cache permanece ativo 
-    // mesmo após reiniciar a aplicação no perfil offline.
+
     @Cacheable(cacheNames = "NcmAplicavelService.validarNcmAplicavel",
             key = "#ncm + ':' + #idClassificacaoTributaria + ':' + #data")
     public boolean validarNcmAplicavel(String ncm, Long idClassificacaoTributaria, String codigoClassificacaoTributaria,

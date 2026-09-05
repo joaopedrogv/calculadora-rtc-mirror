@@ -34,8 +34,7 @@ class Teste_nfse_2_consultarLocalOperacao {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.cIndOp").value("100301"))
                 .andExpect(jsonPath("$.dataOcorrenciaFatoGerador").value("2026-01-01"))
-		.andExpect(jsonPath("$.codigoLocalFornecimento").exists())
-                .andExpect(jsonPath("$.codigoLocalIncidencia").exists());
+                .andExpect(jsonPath("$.localOperacao").exists());
     }
 
     @Test

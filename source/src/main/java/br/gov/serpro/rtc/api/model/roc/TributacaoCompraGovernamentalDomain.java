@@ -1,5 +1,7 @@
 package br.gov.serpro.rtc.api.model.roc;
 
+import static br.gov.serpro.rtc.api.model.input.calculadora.enumeration.TipoEnteGovernamental.ESTADOS;
+import static br.gov.serpro.rtc.api.model.input.calculadora.enumeration.TipoEnteGovernamental.UNIAO;
 import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL;
 import static java.math.BigDecimal.ZERO;
 
@@ -95,7 +97,7 @@ public class TributacaoCompraGovernamentalDomain implements SerializationVisibil
             return this;
         }
         
-        if (tpEnteGov.isUniao()) {
+        if (tpEnteGov == UNIAO) {
             // se uniao compra, fica com tudo - estados e municipios ficam com zero
             return TributacaoCompraGovernamentalDomain.builder()
                     .pAliqCBS(pAliqCBS.add(pAliqIBSUF).add(pAliqIBSMun))
@@ -116,7 +118,7 @@ public class TributacaoCompraGovernamentalDomain implements SerializationVisibil
                 .pAliqCBS(pAliqCBSFinal)
                 .vTribCBS(vTribCBSFinal);
             
-            if (tpEnteGov.isEstado()) {
+            if (tpEnteGov == ESTADOS) {
                 /*
                  * Se estado compra, fica com o valor do municipio e (possivelmente) parte do CBS:
                  *  
@@ -132,9 +134,9 @@ public class TributacaoCompraGovernamentalDomain implements SerializationVisibil
                 b.pAliqIBSUF(pcAliquotaFinal);
                 b.vTribIBSUF(valorFinal);
                 
-            } else if (tpEnteGov.isMunicipio()) { 
+            } else {// municipios / DF
                 /*
-                 * Se municipio compra, fica com o valor da UF e (possivelmente) parte do CBS:
+                 * Se municipio ou DF compra, fica com o valor da UF e (possivelmente) parte do CBS:
                  * 
                  * pAliqCBS = pAliqCBS - (pAliqCBS * pTransferenciaCBS / 100)
                  * vTribCBS = vTribCBS - (vTribCBS * pTransferenciaCBS / 100)
