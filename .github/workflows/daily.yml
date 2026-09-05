@@ -7,7 +7,7 @@ on:
       
     - cron: "17 3 * * *" # Runs every day at 3:17 AM UTC, certificate
       timezone: "UTC"
-      
+
   workflow_dispatch: # Allows manual triggering of the workflow
 
 jobs:
@@ -134,6 +134,62 @@ jobs:
           echo "Final tag name: $TAG_NAME"
           echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
 
+      - name: Extract and validate database from Docker image
+        if: env.is_new_version == 'true'
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mapfile -t IMAGE_ARCHIVES < <(find . -maxdepth 2 -type f -name '*.tar.gz' -print)
+
+          if [ "${#IMAGE_ARCHIVES[@]}" -ne 1 ]; then
+            echo "::error::Esperado exatamente um arquivo .tar.gz da imagem Docker; encontrados: ${#IMAGE_ARCHIVES[@]}."
+            exit 1
+          fi
+
+          LOAD_OUTPUT=$(docker load --input "${IMAGE_ARCHIVES[0]}")
+          echo "$LOAD_OUTPUT"
+
+          IMAGE_REF=$(printf '%s\n' "$LOAD_OUTPUT" | sed -n 's/^Loaded image: //p' | tail -n 1)
+          if [ -z "$IMAGE_REF" ]; then
+            IMAGE_REF=$(printf '%s\n' "$LOAD_OUTPUT" | sed -n 's/^Loaded image ID: //p' | tail -n 1)
+          fi
+
+          if [ -z "$IMAGE_REF" ]; then
+            echo "::error::Não foi possível identificar a imagem carregada."
+            exit 1
+          fi
+
+          CONTAINER_ID=$(docker create "$IMAGE_REF")
+          trap 'docker rm -f "$CONTAINER_ID" >/dev/null 2>&1 || true' EXIT
+
+          mapfile -t DATABASE_PATHS < <(
+            docker export "$CONTAINER_ID" |
+              tar -tf - |
+              grep -E '(^|/)calculadora-pro\.db$' || true
+          )
+
+          if [ "${#DATABASE_PATHS[@]}" -ne 1 ]; then
+            echo "::error::Esperado exatamente um calculadora-pro.db na imagem; encontrados: ${#DATABASE_PATHS[@]}."
+            exit 1
+          fi
+
+          docker cp "$CONTAINER_ID:/${DATABASE_PATHS[0]}" calculadora-pro.db
+
+          python - <<'PY'
+          import sqlite3
+
+          connection = sqlite3.connect("file:calculadora-pro.db?mode=ro", uri=True)
+          try:
+              result = connection.execute("PRAGMA quick_check").fetchone()
+              if result != ("ok",):
+                  raise SystemExit(f"SQLite quick_check falhou: {result!r}")
+          finally:
+              connection.close()
+          PY
+
+          zip -q calculadora-pro.db.zip calculadora-pro.db
+
       - name: Unzip and commit if new version
         if: env.is_new_version == 'true'
         run: |
@@ -176,7 +232,7 @@ jobs:
           SOURCE_ZIP="${{ steps.check_version.outputs.source_zip }}"
           cp "$SOURCE_ZIP" source.zip
 
-      - name: Create versioned and latest Release
+      - name: Create versioned Release
         if: env.is_new_version == 'true'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }} # Alterado de GITHUB_TOKEN para GH_TOKEN
@@ -184,8 +240,8 @@ jobs:
           TAG_NAME="${{ steps.resolve_tag.outputs.tag_name }}"
 
           # Cria o release da versão específica usando o GitHub CLI
-          gh release create "$TAG_NAME" source.zip --title "Calculadora RTC $TAG_NAME" --notes "Código fonte atualizado da Calculadora RTC: $TAG_NAME"
-
-          # Deleta o release latest antigo (se existir) e recria apontando para o novo arquivo/tag
-          # gh release delete latest -y || true
-          # gh release create latest source.zip --title "Calculadora RTC (latest)" --notes "Última versão disponível"
+          gh release create "$TAG_NAME" \
+            source.zip \
+            calculadora-pro.db.zip \
+            --title "Calculadora RTC $TAG_NAME" \
+            --notes "Código fonte e banco de dados da Calculadora RTC: $TAG_NAME"
