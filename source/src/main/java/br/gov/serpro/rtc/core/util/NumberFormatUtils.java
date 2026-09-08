@@ -6,9 +6,6 @@ package br.gov.serpro.rtc.core.util;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 
-/**
- * Centraliza utilitários de formatação numérica, monetária e percentual.
- */
 public class NumberFormatUtils {
 
     private NumberFormatUtils() {

@@ -4,7 +4,6 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.bpe.tm;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -14,20 +13,10 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o grupo totalizador de IBS/CBS do documento fiscal
- * Bilhete de Passagem Eletrônico TM (BPe TM), conforme o schema fiscal
- * correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TIBSCBSTot", propOrder = {
-    "vBCIBSCBS",
-    "gIBS",
-    "gCBS",
-    "gEstornoCred"
-})
+@XmlType(name = "TIBSCBSTot", propOrder = { "vBCIBSCBS", "gIBS", "gCBS", "gEstornoCred" })
 public class TIBSCBSTot {
 
     @XmlElement(required = true)
@@ -44,11 +33,7 @@ public class TIBSCBSTot {
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "vDif",
-        "vDevTrib",
-        "vCBS"
-    })
+    @XmlType(name = "", propOrder = { "vDif", "vDevTrib", "vCBS" })
     public static class GCBS {
 
         @XmlElement(required = true)
@@ -61,14 +46,10 @@ public class TIBSCBSTot {
         private String vCBS;
     }
 
-
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "vIBSEstCred",
-        "vCBSEstCred"
-    })
+    @XmlType(name = "", propOrder = { "vIBSEstCred", "vCBSEstCred" })
     public static class GEstornoCred {
 
         @XmlElement(required = true)
@@ -78,15 +59,10 @@ public class TIBSCBSTot {
         private String vCBSEstCred;
     }
 
-
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "gIBSUF",
-        "gIBSMun",
-        "vIBS"
-    })
+    @XmlType(name = "", propOrder = { "gIBSUF", "gIBSMun", "vIBS" })
     public static class GIBS {
 
         @XmlElement(required = true)
@@ -101,11 +77,7 @@ public class TIBSCBSTot {
         @Getter
         @Setter
         @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "vDif",
-            "vDevTrib",
-            "vIBSMun"
-        })
+        @XmlType(name = "", propOrder = { "vDif", "vDevTrib", "vIBSMun" })
         public static class GIBSMun {
 
             @XmlElement(required = true)
@@ -118,15 +90,10 @@ public class TIBSCBSTot {
             private String vIBSMun;
         }
 
-
         @Getter
         @Setter
         @XmlAccessorType(XmlAccessType.FIELD)
-        @XmlType(name = "", propOrder = {
-            "vDif",
-            "vDevTrib",
-            "vIBSUF"
-        })
+        @XmlType(name = "", propOrder = { "vDif", "vDevTrib", "vIBSUF" })
         public static class GIBSUF {
 
             @XmlElement(required = true)
@@ -138,7 +105,6 @@ public class TIBSCBSTot {
             @XmlElement(required = true)
             private String vIBSUF;
         }
-
     }
 
 }

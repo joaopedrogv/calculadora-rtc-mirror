@@ -11,10 +11,6 @@ import br.gov.serpro.rtc.api.model.SerializationVisibility;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa o bloco de valores totais do ROC, centralizando os tributos
- * consolidados a partir dos objetos calculados.
- */
 @Getter
 @Setter
 @JsonInclude(NON_NULL)

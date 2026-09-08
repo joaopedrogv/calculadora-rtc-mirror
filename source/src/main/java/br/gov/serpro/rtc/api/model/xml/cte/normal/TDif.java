@@ -4,8 +4,9 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.cte.normal;
+
+import java.math.BigDecimal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,23 +15,16 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o grupo de diferimento de IBS/CBS do documento fiscal
- * Conhecimento de Transporte Eletrônico (CTe), conforme o schema fiscal
- * correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TDif", propOrder = {
-    "pDif",
-    "vDif"
-})
+@XmlType(name = "TDif", propOrder = { "pDif", "vDif" })
 public class TDif {
 
     @XmlElement(required = true)
-    private String pDif;
+    private BigDecimal pDif;
 
     @XmlElement(required = true)
-    private String vDif;
+    private BigDecimal vDif;
+
 }

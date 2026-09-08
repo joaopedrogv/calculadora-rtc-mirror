@@ -15,12 +15,6 @@ import java.math.BigDecimal;
 
 import br.gov.serpro.rtc.api.model.SerializationVisibility;
 
-/**
- * Entrada para cálculo da base de CBS e IBS.
- *
- * Informa os valores que integram e não integram a base de cálculo conforme o
- * ano do fato gerador.
- */
 @Getter
 @Setter
 @NoArgsConstructor

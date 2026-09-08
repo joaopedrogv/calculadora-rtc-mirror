@@ -21,10 +21,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa o diferimento aplicado à tributação monofásica, com percentuais e
- * valores diferidos de IBS e CBS.
- */
 @Getter
 @Setter
 @Builder

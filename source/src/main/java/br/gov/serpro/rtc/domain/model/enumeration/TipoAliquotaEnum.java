@@ -9,12 +9,6 @@ import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Enumera os tipos de alíquota aceitos nas classificações tributárias.
- *
- * Valores: {@code PROPRIA}, {@code REFERENCIA}, {@code SETOR_FIXA} e {@code
- * SEM_DESTAQUE_TRIBUTO}.
- */
 @Getter
 @RequiredArgsConstructor
 public enum TipoAliquotaEnum {

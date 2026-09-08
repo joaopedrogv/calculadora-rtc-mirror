@@ -15,10 +15,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa a redução de alíquota aplicada ao tributo, informando o percentual
- * de redução e a alíquota efetiva resultante.
- */
 @Getter
 @Setter
 @Builder

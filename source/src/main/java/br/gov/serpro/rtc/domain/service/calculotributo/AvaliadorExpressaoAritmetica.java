@@ -3,8 +3,8 @@
  */
 package br.gov.serpro.rtc.domain.service.calculotributo;
 
-import static br.gov.serpro.rtc.core.util.ArredondamentoUtils.arredondarInterno;
 import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.HALF_UP;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
@@ -22,10 +22,6 @@ import org.springframework.util.NumberUtils;
 
 import jakarta.annotation.PostConstruct;
 
-/**
- * Serviço responsável por avaliar com segurança expressões aritméticas usadas
- * nas fórmulas tributárias, preservando precisão com BigDecimal.
- */
 @Service
 public class AvaliadorExpressaoAritmetica {
     
@@ -109,7 +105,7 @@ public class AvaliadorExpressaoAritmetica {
         final Object evaluate = jexp.evaluate(new MapContextBigDecimal(variables));
         if (evaluate instanceof Number n) {
             BigDecimal result = NumberUtils.convertNumberToTargetClass(n, BigDecimal.class);
-            return arredondarInterno(result);
+            return result.setScale(scale, HALF_UP);
         } else {
             throw new NumberFormatException("Erro ao avaliar expressão: " + evaluate);
         }

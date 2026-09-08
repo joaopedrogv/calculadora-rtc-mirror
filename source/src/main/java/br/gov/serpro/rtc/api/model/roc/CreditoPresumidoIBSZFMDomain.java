@@ -16,10 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa o crédito presumido de IBS aplicável a fornecimentos originados na
- * Zona Franca de Manaus, com competência, tipo e valor apurado.
- */
 @Getter
 @Setter
 @Builder

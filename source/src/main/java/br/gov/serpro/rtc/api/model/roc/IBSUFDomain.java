@@ -17,10 +17,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa a apuração do IBS de competência da UF no item, com alíquota,
- * diferimento, devolução, redução, valor devido e memória de cálculo.
- */
 @Getter
 @Setter
 @JsonInclude(NON_NULL)

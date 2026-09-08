@@ -12,10 +12,6 @@ import br.gov.serpro.rtc.domain.repository.AliquotaPadraoRepository;
 import br.gov.serpro.rtc.domain.service.exception.AliquotaNaoEncontradaException;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço responsável por consultar a alíquota padrão aplicável por tributo,
- * UF, município e data.
- */
 @RequiredArgsConstructor
 @Service
 public class AliquotaPadraoService {

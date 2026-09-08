@@ -13,10 +13,6 @@ import br.gov.serpro.rtc.domain.service.exception.MunicipioNaoEncontradoExceptio
 import br.gov.serpro.rtc.domain.service.exception.MunicipioNaoPertencenteException;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço responsável por consultar municípios, validar sua vinculação à UF
- * informada e resolver a UF a partir do código municipal.
- */
 @RequiredArgsConstructor
 @Service
 public class MunicipioService {

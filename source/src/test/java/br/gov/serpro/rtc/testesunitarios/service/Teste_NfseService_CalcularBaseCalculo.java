@@ -12,10 +12,6 @@ import java.math.BigDecimal;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.mock;
-
-import br.gov.serpro.rtc.domain.repository.IndicadorOperacaoRepository;
-import br.gov.serpro.rtc.domain.service.NbsService;
 
 import br.gov.serpro.rtc.api.model.input.nfse.NfseBaseCalculoInput;
 import br.gov.serpro.rtc.api.model.output.nfse.NfseBaseCalculoOutput;
@@ -24,14 +20,10 @@ import br.gov.serpro.rtc.domain.service.nfse.NfseService;
 class Teste_NfseService_CalcularBaseCalculo {
 
     private NfseService service;
-    private IndicadorOperacaoRepository indicadorOperacaoRepository;
-    private NbsService nbsService;
 
     @BeforeEach
     void setup() {
-        indicadorOperacaoRepository = mock(IndicadorOperacaoRepository.class);
-        nbsService = mock(NbsService.class);
-        service = new NfseService(indicadorOperacaoRepository, nbsService);
+        service = new NfseService();
     }
 
     @Test

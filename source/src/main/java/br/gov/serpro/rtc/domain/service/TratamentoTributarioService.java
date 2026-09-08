@@ -11,10 +11,6 @@ import br.gov.serpro.rtc.domain.repository.TratamentoTributarioRepository;
 import br.gov.serpro.rtc.domain.service.exception.TratamentoTributarioNaoEncontradoException;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço responsável por consultar o tratamento tributário que fornece as
- * fórmulas e descrições usadas no cálculo.
- */
 @RequiredArgsConstructor
 @Service
 public class TratamentoTributarioService {

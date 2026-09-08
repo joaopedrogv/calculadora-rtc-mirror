@@ -10,6 +10,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.io.IOException;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,12 +28,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.gov.serpro.rtc.api.model.input.OperacaoInput;
 import br.gov.serpro.rtc.domain.service.CalculadoraService;
 import br.gov.serpro.rtc.domain.service.exception.NcmNbsSimultaneasException;
+import br.gov.serpro.rtc.util.JsonResourceObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-testes.yml")
 @ActiveProfiles("testes")
 class Teste_validacao_6_NcmNbsSimultaneasException {
+
+    private static JsonResourceObjectMapper<OperacaoInput> mapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,11 +49,16 @@ class Teste_validacao_6_NcmNbsSimultaneasException {
     
     private OperacaoInput operacao;
 
+    @BeforeAll
+    static void setup() {
+        mapper = new JsonResourceObjectMapper<>(OperacaoInput.class);
+    }
+
     @BeforeEach
     void beforeEach(
             final @Value("classpath:entradas/validacoes/Teste_validacao_6_NcmNbsSimultaneasException.json") Resource resourceFile)
             throws IOException {
-        operacao = objectMapper.readValue(resourceFile.getInputStream(), OperacaoInput.class);
+        operacao = mapper.loadTestJson(resourceFile);
     }
     
     @Test

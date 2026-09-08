@@ -4,8 +4,9 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.cte.simplificado;
+
+import java.math.BigDecimal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,27 +15,14 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o detalhamento de IBS e CBS do documento fiscal
- * Conhecimento de Transporte Eletrônico Simplificado (CTe Simplificado),
- * conforme o schema fiscal correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TCIBS", propOrder = {
-    "vBC",
-    "gIBSUF",
-    "gIBSMun",
-    "vIBS",
-    "gCBS",
-    "gTribRegular",
-    "gTribCompraGov"
-})
+@XmlType(name = "TCIBS", propOrder = { "vBC", "gIBSUF", "gIBSMun", "vIBS", "gCBS", "gTribRegular", "gTribCompraGov" })
 public class TCIBS {
 
     @XmlElement(required = true)
-    private String vBC;
+    private BigDecimal vBC;
 
     @XmlElement(required = true)
     private TCIBS.GIBSUF gIBSUF;
@@ -43,90 +31,66 @@ public class TCIBS {
     private TCIBS.GIBSMun gIBSMun;
 
     @XmlElement(required = true)
-    private String vIBS;
+    private BigDecimal vIBS;
 
     @XmlElement(required = true)
     private TCIBS.GCBS gCBS;
 
     private TTribRegular gTribRegular;
-
     private TTribCompraGov gTribCompraGov;
 
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pCBS",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vCBS"
-    })
+    @XmlType(name = "", propOrder = { "pCBS", "gDif", "gDevTrib", "gRed", "vCBS" })
     public static class GCBS {
 
         @XmlElement(required = true)
-        private String pCBS;
+        private BigDecimal pCBS;
 
         private TDif gDif;
-
         private TDevTrib gDevTrib;
-
         private TRed gRed;
 
         @XmlElement(required = true)
-        private String vCBS;
-    }
+        private BigDecimal vCBS;
 
+    }
 
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pIBSMun",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vIBSMun"
-    })
+    @XmlType(name = "", propOrder = { "pIBSMun", "gDif", "gDevTrib", "gRed", "vIBSMun" })
     public static class GIBSMun {
 
         @XmlElement(required = true)
-        private String pIBSMun;
+        private BigDecimal pIBSMun;
 
         private TDif gDif;
-
         private TDevTrib gDevTrib;
-
         private TRed gRed;
 
         @XmlElement(required = true)
-        private String vIBSMun;
-    }
+        private BigDecimal vIBSMun;
 
+    }
 
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pIBSUF",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vIBSUF"
-    })
+    @XmlType(name = "", propOrder = { "pIBSUF", "gDif", "gDevTrib", "gRed", "vIBSUF" })
     public static class GIBSUF {
 
         @XmlElement(required = true)
-        private String pIBSUF;
+        private BigDecimal pIBSUF;
 
         private TDif gDif;
-
         private TDevTrib gDevTrib;
-
         private TRed gRed;
 
         @XmlElement(required = true)
-        private String vIBSUF;
+        private BigDecimal vIBSUF;
+
     }
 
 }

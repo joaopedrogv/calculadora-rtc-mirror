@@ -6,10 +6,6 @@ package br.gov.serpro.rtc.api.util;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.util.UriComponents;
 
-/**
- * Utilitário HTTP que monta a URL base da requisição atual para compor links
- * absolutos usados pela API.
- */
 public final class HttpUtils {
 
     private HttpUtils() {
@@ -20,8 +16,9 @@ public final class HttpUtils {
         UriComponents uriComponents = ServletUriComponentsBuilder.fromCurrentRequestUri().build();
         String scheme = uriComponents.getScheme();
         String host = uriComponents.getHost();
+        int port = uriComponents.getPort();
 
-        return String.format("%s://%s", scheme, host);
+        return String.format("%s://%s:%d", scheme, host, port);
     }
 
 }

@@ -15,11 +15,6 @@ import org.xml.sax.SAXException;
 import br.gov.serpro.rtc.api.model.xml.enumeration.TipoDocumento;
 import br.gov.serpro.rtc.api.model.xml.enumeration.TipoXml;
 
-/**
- * Componente utilitário responsável por carregar e manter em cache os schemas
- * XSD usados na validação de XML. Centraliza o acesso seguro aos schemas da
- * aplicação, evitando recargas desnecessárias durante as validações.
- */
 @Component
 public class XmlUtil {
 

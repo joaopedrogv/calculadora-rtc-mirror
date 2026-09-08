@@ -6,7 +6,6 @@ package br.gov.serpro.rtc.domain.service.calculotributo;
 import static br.gov.serpro.rtc.domain.model.enumeration.TributoEnum.CBS;
 import static br.gov.serpro.rtc.domain.model.enumeration.TributoEnum.IBS_ESTADUAL;
 import static br.gov.serpro.rtc.domain.model.enumeration.TributoEnum.IBS_MUNICIPAL;
-import static java.math.BigDecimal.ZERO;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import br.gov.serpro.rtc.api.model.input.ItemOperacaoInput;
-import br.gov.serpro.rtc.api.model.input.calculadora.enumeration.TipoEnteGovernamental;
 import br.gov.serpro.rtc.api.model.output.CbsIbsOutput;
 import br.gov.serpro.rtc.api.model.roc.AjusteCompetenciaDomain;
 import br.gov.serpro.rtc.api.model.roc.CBSDomain;
@@ -36,7 +34,6 @@ import br.gov.serpro.rtc.api.model.roc.MonofasiaDomain;
 import br.gov.serpro.rtc.api.model.roc.MonofasiaPadraoDomain;
 import br.gov.serpro.rtc.api.model.roc.MonofasiaRetencaoDomain;
 import br.gov.serpro.rtc.api.model.roc.MonofasiaRetidoAnteriormenteDomain;
-import br.gov.serpro.rtc.api.model.roc.ReducaoAliquotaDomain;
 import br.gov.serpro.rtc.api.model.roc.TransferenciaCreditoDomain;
 import br.gov.serpro.rtc.api.model.roc.TributacaoCompraGovernamentalDomain;
 import br.gov.serpro.rtc.api.model.roc.TributacaoRegularDomain;
@@ -45,16 +42,11 @@ import br.gov.serpro.rtc.api.model.roc.TributosDomain;
 import br.gov.serpro.rtc.domain.model.dto.TratamentoClassificacaoDTO;
 import br.gov.serpro.rtc.domain.model.enumeration.TributoEnum;
 import br.gov.serpro.rtc.domain.service.MemoriaCalculoService;
-import br.gov.serpro.rtc.domain.service.TransferenciaCBSService;
 import br.gov.serpro.rtc.domain.service.calculotributo.model.AliquotaImpostoSeletivoModel;
 import br.gov.serpro.rtc.domain.service.calculotributo.model.OperacaoModel;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Serviço responsável por orquestrar o cálculo de CBS, IBS e Imposto Seletivo
- * de um item, inclusive a geração da memória de cálculo.
- */
 @Slf4j
 @RequiredArgsConstructor
 @Service
@@ -63,7 +55,6 @@ public class CalculoTributoService {
 	private final CalculoCbsIbsService calculoCbsIbsService;
 	private final CalculoImpostoSeletivoService calculoImpostoSeletivoService;
 	private final MemoriaCalculoService memoriaCalculoService;
-    private final TransferenciaCBSService transferenciaService;
 
     @Value("${application.ibs.enabled}")
     private boolean calculoIbsHabilitado;
@@ -105,22 +96,22 @@ public class CalculoTributoService {
         if (tratamentoClassificacaoCbsIbs != null) {
             final BigDecimal impostoSeletivoCalculado = impostoSeletivo != null
                     ? impostoSeletivo.getValorImpostoSeletivo()
-                    : ZERO;
+                    : BigDecimal.ZERO;
             
             log.debug("Iniciando cálculo assíncrono de CBS/IBS...");
             final CompletableFuture<CbsIbsOutput> cbsFuture = calcularCbsIbsAsync(CBS, null, null, item,
                     tratamentoClassificacaoCbsIbs, impostoSeletivoCalculado, temDesoneracao, data,
-                    operacao.getTpEnteGov(), operacao.getPRedutor(), tratamentoClassificacao, true);
+                    tratamentoClassificacao, true);
 
             final var calcularIBS = calculoIbsHabilitado || nbs != null;
 
             final CompletableFuture<CbsIbsOutput> ibsEstadualFuture = calcularCbsIbsAsync(IBS_ESTADUAL,
                     operacao.getCodigoUf(), null, item, tratamentoClassificacaoCbsIbs, impostoSeletivoCalculado,
-                    temDesoneracao, data, operacao.getTpEnteGov(), operacao.getPRedutor(), tratamentoClassificacao, calcularIBS);
+                    temDesoneracao, data, tratamentoClassificacao, calcularIBS);
 
             final CompletableFuture<CbsIbsOutput> ibsMunicipalFuture = calcularCbsIbsAsync(IBS_MUNICIPAL,
                     null, operacao.getCodigoMunicipio(), item, tratamentoClassificacaoCbsIbs, impostoSeletivoCalculado,
-                    temDesoneracao, data, operacao.getTpEnteGov(), operacao.getPRedutor(), tratamentoClassificacao, calcularIBS);
+                    temDesoneracao, data, tratamentoClassificacao, calcularIBS);
 
             // Sincroniza e obtém os resultados
             try {
@@ -146,15 +137,14 @@ public class CalculoTributoService {
 
         }
 
-        // Regra: Suspensão de CBS e IBS não suspende o Imposto Seletivo automaticamente.
-        // if (temDesoneracao && impostoSeletivo != null) {
-        //     impostoSeletivo.setVIS(BigDecimal.ZERO);
-        // }
+        if (temDesoneracao && impostoSeletivo != null) {
+            impostoSeletivo.setVIS(BigDecimal.ZERO);
+        }
 		
 		return TributosDomain
 				.builder()
 				.IS(impostoSeletivo)
-                .IBSCBS(getIBSCBS(item, cbs, ibsEstadual, ibsMunicipal, operacao.getTpEnteGov(), data))
+				.IBSCBS(getIBSCBS(item, cbs, ibsEstadual, ibsMunicipal))
 				.build();
 	}
 	
@@ -181,8 +171,6 @@ public class CalculoTributoService {
 	        BigDecimal impostoSeletivoCalculado,
 	        Boolean temDesoneracao,
 	        LocalDate data,
-	        TipoEnteGovernamental tpEnteGov,
-	        BigDecimal pRedutor,
 	        TratamentoClassificacaoDTO tratamentoClassificacao,
 	        boolean calcularTributo
 	) {
@@ -195,7 +183,7 @@ public class CalculoTributoService {
 	        log.debug("> {} - Iniciando cálculo assíncrono", descricao);
 	        CbsIbsOutput output = calculoCbsIbsService.calcularCbsIbs(
 	                tributo, codigoUf, codigoMunicipio, item,
-	                tratamentoClassificacaoCbsIbs, impostoSeletivoCalculado, temDesoneracao, data, tpEnteGov, pRedutor);
+	                tratamentoClassificacaoCbsIbs, impostoSeletivoCalculado, temDesoneracao, data);
 	        log.debug("> {} - Cálculo assíncrono finalizado", descricao);
 	        
 	        log.debug(">> {} - Iniciando memória de cálculo", descricao);
@@ -206,13 +194,13 @@ public class CalculoTributoService {
 	    });
 	}
 
-    private IBSCBSDomain getIBSCBS(ItemOperacaoInput item, CbsIbsOutput cbs, CbsIbsOutput ibsEstadual,
-            CbsIbsOutput ibsMunicipal, TipoEnteGovernamental tpEnteGov, LocalDate dataFatoGerador) {
+    private static IBSCBSDomain getIBSCBS(ItemOperacaoInput item, CbsIbsOutput cbs, CbsIbsOutput ibsEstadual,
+            CbsIbsOutput ibsMunicipal) {
         final var monofasia = getMonofasia(cbs, ibsEstadual, ibsMunicipal);
         return IBSCBSDomain.builder()
                 .CST(item.getCst())
                 .cClassTrib(item.getCClassTrib())
-                .gIBSCBS(monofasia == null ? getGIBSCBS(cbs, ibsEstadual, ibsMunicipal, tpEnteGov, dataFatoGerador) : null) // FIXME somente se não for monofásico
+                .gIBSCBS(monofasia == null ? getGIBSCBS(cbs, ibsEstadual, ibsMunicipal) : null) // FIXME somente se não for monofásico
                 .gIBSCBSMono(monofasia)
                 .gTransfCred(getTransferenciaCredito(cbs, ibsEstadual, ibsMunicipal))
                 .gAjusteCompet(getAjusteCompetencia(cbs, ibsEstadual, ibsMunicipal))
@@ -222,132 +210,27 @@ public class CalculoTributoService {
                 .build();
     }
 
-    private GrupoIBSCBSDomain getGIBSCBS(CbsIbsOutput cbs, CbsIbsOutput ibsEstadual, CbsIbsOutput ibsMunicipal, TipoEnteGovernamental tpEnteGov, LocalDate dataFatoGerador) {
-        
-        // CST sem gIBSCBS (ex: imunidade): nenhum tributo foi calculado, não gera grupo.
-        // Analisar a possibilidade de usar OR.
-        if (cbs == null && ibsEstadual == null && ibsMunicipal == null) {
-            return null;
-        }
-
-        final var pTransferenciaCBS = transferenciaService.getPercentualTransferencia(dataFatoGerador);
-        final var compraGovernamental = getCompraGovernamental(cbs, ibsEstadual, ibsMunicipal);
-        final var compraGovernamentalEfetiva = compraGovernamental == null ? null : compraGovernamental.getValoresEfetivos(tpEnteGov, pTransferenciaCBS, dataFatoGerador);
-        
-		/*
-		 * Tratar o impacto das compras governamentais efetivas (com rateio entre os
-		 * entes já realizado) nos valores do grupo IBS/CBS. Ajustar os dados dos
-		 * CbsIbsOutput originais antes de criar os grupos com base nos seus valores 
-		 */
-        /**
-        	Suspensão com compra gov
-        	------------------------ 
-        	Grupo Principal 	 - tem que ser zero, pois está suspenso
-        	Grupo gRed 			 - mesmo não permitido (suspensão) deve ser criado (compra governamental) com o percentual de redução igual a zero (suspensão) e alíquota efetiva igual a zero (suspensão, mesmo que seja compra gov)
-        	Grupo gTribRegular   - tem que apresentar o cálculo sem suspensão e com o desconto (se for o caso) e o rateio da compra gov
-        	Grupo gTribCompraGov - tem que apresentar o cálculo com suspensão, tudo zerado
-         */ 
-        
-        trataImpactoCompraGovCBS(cbs, compraGovernamentalEfetiva);
-        trataImpactoCompraGovIBSUF(ibsEstadual, compraGovernamentalEfetiva);
-        trataImpactoCompraGovIBSMun(ibsMunicipal, compraGovernamentalEfetiva);
-        
+    private static GrupoIBSCBSDomain getGIBSCBS(CbsIbsOutput cbs, CbsIbsOutput ibsEstadual, CbsIbsOutput ibsMunicipal) {
         final var vBC = getVBC(ibsMunicipal, getVBC(ibsEstadual, getVBC(cbs, null)));
-        final var gIBSUF = getIBSUF(ibsEstadual, compraGovernamentalEfetiva);
-        final var gIBSMun = getIBSMun(ibsMunicipal, compraGovernamentalEfetiva);
-        final var vIBS = getVIbs(gIBSUF, gIBSMun);
-        final var gCBS = getCbs(cbs, compraGovernamentalEfetiva);
+        final var ibsUF = getIBSUF(ibsEstadual);
+        final var ibsMun = getIBSMun(ibsMunicipal);
+        final var vIBS = getVIbs(ibsUF, ibsMun);
         final var tributacaoRegular = getTributacaoRegular(cbs, ibsEstadual, ibsMunicipal);
-        
-        if (tributacaoRegular != null && compraGovernamental != null) {
-        	// suspensao com compra gov - zera valores
-			compraGovernamental.zerarValores();
-		}
-        		
-		return GrupoIBSCBSDomain.builder()
+        final var compraGovernamental = getCompraGovernamental(cbs, ibsEstadual, ibsMunicipal);
+        return GrupoIBSCBSDomain.builder()
 		        .vBC(vBC)
-                .gIBSUF(gIBSUF)
-                .gIBSMun(gIBSMun)
+                .gIBSUF(ibsUF)
+                .gIBSMun(ibsMun)
                 .vIBS(vIBS)
-		        .gCBS(gCBS)
+		        .gCBS(getCbs(cbs))
 		        .gTribRegular(tributacaoRegular)
 		        .gTribCompraGov(compraGovernamental)
 		        .build();
     }
-    
-	private static void trataImpactoCompraGovCBS(CbsIbsOutput cbs, TributacaoCompraGovernamentalDomain compraGov) {
-		if (cbs != null && compraGov != null) {
-			var grupoReducaoCbs = cbs.getGrupoReducao();
-			if (grupoReducaoCbs == null) {
-				grupoReducaoCbs = ReducaoAliquotaDomain.builder().pRedAliq(ZERO).build();
-				cbs.setGrupoReducao(grupoReducaoCbs);
-			}
-			
-			final var tributacaoRegular = cbs.getTributacaoRegular();
-			if (tributacaoRegular != null) {
-				// possui suspensao
-				grupoReducaoCbs.setPRedAliq(ZERO);
-				grupoReducaoCbs.setPAliqEfet(ZERO);
-				cbs.setTributoDevido(ZERO);
-				tributacaoRegular.setAliquotaEfetiva(compraGov.getPAliqCBS());
-				tributacaoRegular.setTributoDevido(compraGov.getVTribCBS());
-			} else {
-				grupoReducaoCbs.setPAliqEfet(compraGov.getPAliqCBS());
-				cbs.setTributoDevido(compraGov.getVTribCBS());
-			}
-		}
-	}
-
-	private static void trataImpactoCompraGovIBSUF(CbsIbsOutput ibsUF, TributacaoCompraGovernamentalDomain compraGov) {
-		if (ibsUF != null && compraGov != null) {
-			var grupoReducaoIbsUF = ibsUF.getGrupoReducao();
-			if (grupoReducaoIbsUF == null) {
-				grupoReducaoIbsUF = ReducaoAliquotaDomain.builder().pRedAliq(ZERO).build();
-				ibsUF.setGrupoReducao(grupoReducaoIbsUF);
-			}
-			
-			final var tributacaoRegular = ibsUF.getTributacaoRegular();
-			if (tributacaoRegular != null) {
-				// possui suspensao
-				grupoReducaoIbsUF.setPRedAliq(ZERO);
-				grupoReducaoIbsUF.setPAliqEfet(ZERO);
-				ibsUF.setTributoDevido(ZERO);
-				tributacaoRegular.setAliquotaEfetiva(compraGov.getPAliqIBSUF());
-				tributacaoRegular.setTributoDevido(compraGov.getVTribIBSUF());
-			} else {
-				grupoReducaoIbsUF.setPAliqEfet(compraGov.getPAliqIBSUF());
-				ibsUF.setTributoDevido(compraGov.getVTribIBSUF());
-			}
-		}
-	}
-
-	private static void trataImpactoCompraGovIBSMun(CbsIbsOutput ibsMun,
-			TributacaoCompraGovernamentalDomain compraGov) {
-		if (ibsMun != null && compraGov != null) {
-			var grupoReducaoIbsMun = ibsMun.getGrupoReducao();
-			if (grupoReducaoIbsMun == null) {
-				grupoReducaoIbsMun = ReducaoAliquotaDomain.builder().pRedAliq(ZERO).build();
-				ibsMun.setGrupoReducao(grupoReducaoIbsMun);
-			}
-			
-			final var tributacaoRegular = ibsMun.getTributacaoRegular();
-			if (tributacaoRegular != null) {
-				// possui suspensao
-				grupoReducaoIbsMun.setPRedAliq(ZERO);
-				grupoReducaoIbsMun.setPAliqEfet(ZERO);
-				ibsMun.setTributoDevido(ZERO);
-				tributacaoRegular.setAliquotaEfetiva(compraGov.getPAliqIBSMun());
-				tributacaoRegular.setTributoDevido(compraGov.getVTribIBSMun());
-			} else {
-				grupoReducaoIbsMun.setPAliqEfet(compraGov.getPAliqIBSMun());
-				ibsMun.setTributoDevido(compraGov.getVTribIBSMun());
-			}
-		}
-	}
 
     private static BigDecimal getVIbs(IBSUFDomain ibsUF, IBSMunDomain ibsMun) {
-        final var vIbsUF = ibsUF != null ? ibsUF.getVIBSUF() : ZERO;
-        final var vIbsMun = ibsMun != null ? ibsMun.getVIBSMun() : ZERO;
+        final var vIbsUF = ibsUF != null ? ibsUF.getVIBSUF() : BigDecimal.ZERO;
+        final var vIbsMun = ibsMun != null ? ibsMun.getVIBSMun() : BigDecimal.ZERO;
         return vIbsUF.add(vIbsMun);
     }
 	
@@ -361,7 +244,7 @@ public class CalculoTributoService {
         return null;
     }
 	
-    private static IBSUFDomain getIBSUF(CbsIbsOutput ibsEstadual, TributacaoCompraGovernamentalDomain compraGov) {
+    private static IBSUFDomain getIBSUF(CbsIbsOutput ibsEstadual) {
         if (ibsEstadual == null) {
             return null;
         }
@@ -375,7 +258,7 @@ public class CalculoTributoService {
         return ibsUF;
     }
 	
-	private static IBSMunDomain getIBSMun(CbsIbsOutput ibsMunicipal, TributacaoCompraGovernamentalDomain compraGov) {
+	private static IBSMunDomain getIBSMun(CbsIbsOutput ibsMunicipal) {
 	    if (ibsMunicipal == null) {
             return null;
         }
@@ -389,7 +272,7 @@ public class CalculoTributoService {
         return ibsMun;
 	}
 
-    private static CBSDomain getCbs(CbsIbsOutput cbsOut, TributacaoCompraGovernamentalDomain compraGov) {
+    private static CBSDomain getCbs(CbsIbsOutput cbsOut) {
         if (cbsOut == null) {
             return null;
         }
@@ -464,34 +347,9 @@ public class CalculoTributoService {
         return null;
     }
     
+    // TODO - Implementar compra governamental
     private static TributacaoCompraGovernamentalDomain getCompraGovernamental(CbsIbsOutput cbs, 
             CbsIbsOutput ibsEstadual, CbsIbsOutput ibsMunicipal) {
-        
-        final var possuiCompraGovCBS = cbs.possuiCompraGov();
-        final var possuiCompraGovIBSUF = ibsEstadual.possuiCompraGov();
-        final var possuiCompraGovIBSMun = ibsMunicipal.possuiCompraGov();
-        
-        boolean possuiCompraGov = possuiCompraGovCBS && possuiCompraGovIBSUF && possuiCompraGovIBSMun;
-        if (possuiCompraGov) {
-            // aqui, fazer o merge das compras governamentais de cada tributo em um só
-            final var compraGovCBS = cbs.getCompraGovernamental();
-            final var compraGovIBSUF = ibsEstadual.getCompraGovernamental();
-            final var compraGovIBSMun = ibsMunicipal.getCompraGovernamental();
-            
-            return TributacaoCompraGovernamentalDomain.builder()
-                    .pAliqCBS(compraGovCBS.getPAliqCBS())
-                    .vTribCBS(compraGovCBS.getVTribCBS())
-                    .pAliqIBSUF(compraGovIBSUF.getPAliqIBSUF())
-                    .vTribIBSUF(compraGovIBSUF.getVTribIBSUF())
-                    .pAliqIBSMun(compraGovIBSMun.getPAliqIBSMun())
-                    .vTribIBSMun(compraGovIBSMun.getVTribIBSMun())
-                    .build();
-        } else {
-            boolean possuiAlgumDiferente = possuiCompraGovCBS || possuiCompraGovIBSUF || possuiCompraGovIBSMun;
-            if (possuiAlgumDiferente) {
-                throw new RuntimeException("Erro ao consolidar valores de compras governamentais. Algum dos tributos não calculou compra governamental.");
-            }
-        }
         return null;        
     }
     
@@ -544,12 +402,12 @@ public class CalculoTributoService {
                     .gMonoDif(monoDif);
             
             // Calcular totalizadores
-            var vIBSMono = monoPadrao != null ? monoPadrao.getVIBSMono() : ZERO;
-            var vCBSMono = monoPadrao != null ? monoPadrao.getVCBSMono() : ZERO;
-            var vIBSMonoReten = monoReten != null ? monoReten.getVIBSMonoReten() : ZERO;
-            var vCBSMonoReten = monoReten != null ? monoReten.getVCBSMonoReten() : ZERO;
-            var vIBSMonoDif = monoDif != null ? monoDif.getVIBSMonoDif() : ZERO;
-            var vCBSMonoDif = monoDif != null ? monoDif.getVCBSMonoDif() : ZERO;
+            var vIBSMono = monoPadrao != null ? monoPadrao.getVIBSMono() : BigDecimal.ZERO;
+            var vCBSMono = monoPadrao != null ? monoPadrao.getVCBSMono() : BigDecimal.ZERO;
+            var vIBSMonoReten = monoReten != null ? monoReten.getVIBSMonoReten() : BigDecimal.ZERO;
+            var vCBSMonoReten = monoReten != null ? monoReten.getVCBSMonoReten() : BigDecimal.ZERO;
+            var vIBSMonoDif = monoDif != null ? monoDif.getVIBSMonoDif() : BigDecimal.ZERO;
+            var vCBSMonoDif = monoDif != null ? monoDif.getVCBSMonoDif() : BigDecimal.ZERO;
             
             var vTotIBSMonoItem = vIBSMono.add(vIBSMonoReten).subtract(vIBSMonoDif);
             var vTotCBSMonoItem = vCBSMono.add(vCBSMonoReten).subtract(vCBSMonoDif);

@@ -13,11 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import br.gov.serpro.rtc.domain.model.entity.PercentualReducao;
 
-/**
- * Repositório Spring Data JPA para acesso a {@link PercentualReducao}, com
- * consulta do percentual de redução por classificação tributária, tributo e
- * data.
- */
 @Repository
 public interface PercentualReducaoRepository extends JpaRepository<PercentualReducao, Long> {
 

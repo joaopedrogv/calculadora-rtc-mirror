@@ -12,10 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Saída de dados abertos com a fundamentação normativa associada à
- * classificação e à situação tributária.
- */
 @Getter
 @Setter
 @Builder

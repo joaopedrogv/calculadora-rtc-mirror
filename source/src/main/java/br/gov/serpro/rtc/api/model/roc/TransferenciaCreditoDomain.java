@@ -16,10 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa os valores de transferência de crédito de IBS e CBS gerados na
- * operação.
- */
 @Getter
 @Setter
 @Builder

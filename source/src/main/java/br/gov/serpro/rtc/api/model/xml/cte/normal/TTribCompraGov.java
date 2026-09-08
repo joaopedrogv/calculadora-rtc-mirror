@@ -4,8 +4,9 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.cte.normal;
+
+import java.math.BigDecimal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,39 +15,29 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o grupo de tributação de compra governamental do
- * documento fiscal Conhecimento de Transporte Eletrônico (CTe), conforme o
- * schema fiscal correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TTribCompraGov", propOrder = {
-    "pAliqIBSUF",
-    "vTribIBSUF",
-    "pAliqIBSMun",
-    "vTribIBSMun",
-    "pAliqCBS",
-    "vTribCBS"
-})
+@XmlType(name = "TTribCompraGov", propOrder = { "pAliqIBSUF", "vTribIBSUF", "pAliqIBSMun", "vTribIBSMun", "pAliqCBS",
+        "vTribCBS" })
 public class TTribCompraGov {
 
     @XmlElement(required = true)
-    private String pAliqIBSUF;
+    private BigDecimal pAliqIBSUF;
 
     @XmlElement(required = true)
-    private String vTribIBSUF;
+    private BigDecimal vTribIBSUF;
 
     @XmlElement(required = true)
-    private String pAliqIBSMun;
+    private BigDecimal pAliqIBSMun;
 
     @XmlElement(required = true)
-    private String vTribIBSMun;
+    private BigDecimal vTribIBSMun;
 
     @XmlElement(required = true)
-    private String pAliqCBS;
+    private BigDecimal pAliqCBS;
 
     @XmlElement(required = true)
-    private String vTribCBS;
+    private BigDecimal vTribCBS;
+
 }

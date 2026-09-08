@@ -4,7 +4,6 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.cte.simplificado;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -14,21 +13,10 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o grupo de tributos IBS/CBS do documento fiscal
- * Conhecimento de Transporte Eletrônico Simplificado (CTe Simplificado),
- * conforme o schema fiscal correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TTribCTe", propOrder = {
-    "CST",
-    "cClassTrib",
-    "indDoacao",
-    "gIBSCBS",
-    "gEstornoCred"
-})
+@XmlType(name = "TTribCTe", propOrder = { "CST", "cClassTrib", "indDoacao", "gIBSCBS", "gEstornoCred" })
 public class TTribCTe {
 
     @XmlElement(required = true)
@@ -42,4 +30,5 @@ public class TTribCTe {
     private TCIBS gIBSCBS;
 
     private TEstornoCred gEstornoCred;
+
 }

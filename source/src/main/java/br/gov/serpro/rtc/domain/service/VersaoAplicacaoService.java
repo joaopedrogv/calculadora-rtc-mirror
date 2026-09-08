@@ -9,10 +9,6 @@ import org.springframework.stereotype.Service;
 
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço responsável por montar os cabeçalhos HTTP com as versões da aplicação
- * e da base de dados em uso.
- */
 @RequiredArgsConstructor
 @Service
 public class VersaoAplicacaoService {

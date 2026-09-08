@@ -13,10 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code MUNICIPIO} que representa municípios
- * cadastrados, com código, nome e unidade federativa.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

@@ -15,10 +15,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Saída de um trecho do pedágio, com base de cálculo, extensão e tributos
- * apurados por ente.
- */
 @Getter
 @Setter
 @Builder

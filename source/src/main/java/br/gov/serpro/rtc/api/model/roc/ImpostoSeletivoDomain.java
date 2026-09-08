@@ -22,11 +22,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa a apuração do Imposto Seletivo do item, com classificação
- * tributária, base de cálculo, alíquotas, quantidade tributável, valor devido e
- * memória de cálculo.
- */
 @Getter
 @Setter
 @Builder

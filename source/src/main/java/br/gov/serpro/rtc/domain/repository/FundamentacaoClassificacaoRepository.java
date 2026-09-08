@@ -15,11 +15,6 @@ import org.springframework.stereotype.Repository;
 import br.gov.serpro.rtc.domain.model.dto.FundamentacaoClassificacaoDTO;
 import br.gov.serpro.rtc.domain.model.entity.FundamentacaoClassificacao;
 
-/**
- * Repositório Spring Data JPA para acesso a {@link FundamentacaoClassificacao},
- * com consultas de fundamentação legal por classificação tributária e listagem
- * das fundamentações vigentes.
- */
 @Repository
 public interface FundamentacaoClassificacaoRepository extends JpaRepository<FundamentacaoClassificacao, Long> {
 
@@ -43,7 +38,6 @@ public interface FundamentacaoClassificacaoRepository extends JpaRepository<Fund
     @Query("""
             FROM FundamentacaoClassificacao fc
             WHERE :data BETWEEN fc.inicioVigencia AND COALESCE(fc.fimVigencia, :data)
-            ORDER BY fc.classificacaoTributaria.codigo
             """)
     List<FundamentacaoClassificacao> buscarTodas(
             @Param("data") LocalDate data);

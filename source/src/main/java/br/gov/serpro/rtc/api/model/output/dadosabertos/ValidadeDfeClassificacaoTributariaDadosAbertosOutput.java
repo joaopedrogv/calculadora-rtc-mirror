@@ -12,10 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Saída de dados abertos com validações entre a sigla do DFe informado e a
- * classificação tributária.
- */
 @Getter
 @Setter
 @Builder
@@ -36,8 +32,5 @@ public class ValidadeDfeClassificacaoTributariaDadosAbertosOutput implements Ser
 
     @Schema(name = "permiteDiferimento", description = "Indica se a classificação tributária permite diferimento", example = "false")
     private boolean permiteDiferimento;
-
-    @Schema(name = "possibilidadeCreditoPresumido", description = "Indica se há possibilidade de crédito presumido na operação", example = "false")
-    private boolean possibilidadeCreditoPresumido;
 
 }

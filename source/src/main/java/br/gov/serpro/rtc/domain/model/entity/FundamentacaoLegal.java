@@ -13,11 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code FUNDAMENTACAO_LEGAL} que armazena os textos e
- * referências normativas usados como fundamentação legal das classificações
- * tributárias.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

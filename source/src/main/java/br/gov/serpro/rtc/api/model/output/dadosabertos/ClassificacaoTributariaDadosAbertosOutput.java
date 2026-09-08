@@ -16,10 +16,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Saída de dados abertos com os metadados e indicadores da classificação
- * tributária.
- */
 @Getter
 @Setter
 @Builder

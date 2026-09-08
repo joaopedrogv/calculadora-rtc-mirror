@@ -15,10 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code ALIQUOTA_AD_VALOREM_PRODUTO} que vincula um NCM
- * à alíquota ad valorem aplicável a produtos, com controle de vigência.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

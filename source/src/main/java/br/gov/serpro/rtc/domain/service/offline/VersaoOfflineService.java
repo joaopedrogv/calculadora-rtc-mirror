@@ -19,10 +19,6 @@ import br.gov.serpro.rtc.domain.service.VersaoBaseDadosService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
-/**
- * Serviço responsável por comparar as versões locais e remotas da aplicação e
- * da base de dados quando a API opera em modo offline.
- */
 @Slf4j
 @Service
 @Profile("offline")
@@ -57,21 +53,38 @@ public class VersaoOfflineService {
     }
 
     public VersaoOfflineOutput verificarVersao() {
-        var ultimaVersao = versaoBaseDadosService.getUltimaVersao();
-
-        VersaoOutput local = VersaoOutput.builder()
-                .versaoApp(versaoAplicacaoLocal)
-                .versaoDb(ultimaVersao.getNumeroVersao())
-                .dataVersaoDb(ultimaVersao.getData().toString())
-                .build();
-
-        VersaoOutput remota = consultarVersaoRemota();
-
-        return new VersaoOfflineOutput(local, remota);
+        VersaoOutput versaoRemota = consultarVersaoRemota();
+        return compararVersoes(versaoRemota);
     }
 
     private VersaoOutput consultarVersaoRemota() {
         return restTemplate.getForObject(urlVersaoRemota, VersaoOutput.class);
+    }
+
+    private VersaoOfflineOutput compararVersoes(VersaoOutput versaoRemota) {
+        String versaoDbLocal = versaoBaseDadosService.getUltimaVersao().getNumeroVersao();
+        String dataDbLocal = versaoBaseDadosService.getUltimaVersao().getData().toString();
+
+        String versaoAplicacaoRemota = versaoRemota != null ? versaoRemota.getVersaoApp() : null;
+        String versaoDbRemota = versaoRemota != null ? versaoRemota.getVersaoDb() : null;
+        String dataDbRemota = versaoRemota != null ? versaoRemota.getDataVersaoDb() : null;
+
+        boolean aplicacaoAtualizada = versaoAplicacaoLocal.equals(versaoAplicacaoRemota);
+        boolean dbAtualizada = versaoDbLocal.equals(versaoDbRemota);
+        boolean dataDbAtualizada = dataDbLocal.equals(dataDbRemota);
+
+        VersaoOfflineOutput output = new VersaoOfflineOutput();
+        output.setAplicacaoAtualizada(aplicacaoAtualizada);
+        output.setDbAtualizada(dbAtualizada);
+        output.setDataDbAtualizada(dataDbAtualizada);
+        output.setVersaoAplicacaoLocal(versaoAplicacaoLocal);
+        output.setVersaoAplicacaoRemota(versaoAplicacaoRemota);
+        output.setVersaoDbLocal(versaoDbLocal);
+        output.setVersaoDbRemota(versaoDbRemota);
+        output.setDataDbLocal(dataDbLocal);
+        output.setDataDbRemota(dataDbRemota);
+
+        return output;
     }
 
     private void exibirStatusVersao(VersaoOfflineOutput status) {

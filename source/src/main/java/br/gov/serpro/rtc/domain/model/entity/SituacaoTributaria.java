@@ -13,11 +13,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code SITUACAO_TRIBUTARIA} que representa a situação
- * tributária/CST com descrição e indicadores de grupos fiscais relevantes ao
- * cálculo.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

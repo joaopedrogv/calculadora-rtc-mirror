@@ -17,10 +17,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa o diferimento aplicado ao tributo, com percentual e valor
- * diferido.
- */
 @Getter
 @Setter
 @Builder

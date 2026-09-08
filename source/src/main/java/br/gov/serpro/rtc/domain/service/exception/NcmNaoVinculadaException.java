@@ -3,10 +3,6 @@
  */
 package br.gov.serpro.rtc.domain.service.exception;
 
-/**
- * Exceção lançada quando a NCM informada não possui vínculo válido com a
- * classificação tributária usada na operação.
- */
 public class NcmNaoVinculadaException extends ValidacaoException {
 
     private static final long serialVersionUID = 7846374985007827745L;

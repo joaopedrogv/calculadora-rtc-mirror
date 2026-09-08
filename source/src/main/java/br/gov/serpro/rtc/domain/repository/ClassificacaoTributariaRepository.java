@@ -4,7 +4,6 @@
 package br.gov.serpro.rtc.domain.repository;
 
 import java.time.LocalDate;
-import java.util.List;
 
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,11 +16,6 @@ import br.gov.serpro.rtc.domain.model.dto.ClassificacaoTributariaCalculoDTO;
 import br.gov.serpro.rtc.domain.model.dto.ClassificacaoTributariaDTO;
 import br.gov.serpro.rtc.domain.model.entity.ClassificacaoTributaria;
 
-/**
- * Repositório Spring Data JPA para acesso a {@link ClassificacaoTributaria},
- * com consultas por código e tributo, dados resumidos para cálculo e
- * classificações de serviço sem vínculo de NBS.
- */
 @Repository
 public interface ClassificacaoTributariaRepository extends JpaRepository<ClassificacaoTributaria, Long> {
     
@@ -67,17 +61,4 @@ public interface ClassificacaoTributariaRepository extends JpaRepository<Classif
     ClassificacaoTributariaCalculoDTO buscarClassificacaoTributariaCalculo(
             @Param("id") long id);
 
-    @NativeQuery(value = """
-            SELECT ct.CLTR_CD
-            FROM CLASSIFICACAO_TRIBUTARIA ct
-            WHERE (ct.CLTR_NOMENCLATURA LIKE '%NBS%')
-            AND :data BETWEEN ct.CLTR_INICIO_VIGENCIA AND COALESCE(ct.CLTR_FIM_VIGENCIA, :data)
-            AND ct.CLTR_ID NOT IN (
-                SELECT n.NBSA_CLTR_ID
-                FROM NBS_APLICAVEL n
-                WHERE :data BETWEEN n.NBSA_INICIO_VIGENCIA AND COALESCE(n.NBSA_FIM_VIGENCIA, :data)
-            )
-    """)
-    @Cacheable(cacheNames = "ClassificacaoTributariaRepository.listarCodigosClassificacoesServicoSemVinculoNbs")
-    List<String> listarCodigosClassificacoesServicoSemVinculoNbs(@Param("data") LocalDate data);
 }

@@ -4,5 +4,8 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-@jakarta.xml.bind.annotation.XmlSchema(namespace = "http://www.portalfiscal.inf.br/bpe", elementFormDefault = jakarta.xml.bind.annotation.XmlNsForm.QUALIFIED)
+@XmlSchema(namespace = "http://www.portalfiscal.inf.br/bpe", elementFormDefault = XmlNsForm.QUALIFIED)
 package br.gov.serpro.rtc.api.model.xml.bpe.normal;
+
+import jakarta.xml.bind.annotation.XmlNsForm;
+import jakarta.xml.bind.annotation.XmlSchema;

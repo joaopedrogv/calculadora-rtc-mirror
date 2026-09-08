@@ -4,8 +4,9 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.cte.normal;
+
+import java.math.BigDecimal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,23 +15,16 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o grupo de redução de IBS/CBS do documento fiscal
- * Conhecimento de Transporte Eletrônico (CTe), conforme o schema fiscal
- * correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TRed", propOrder = {
-    "pRedAliq",
-    "pAliqEfet"
-})
+@XmlType(name = "TRed", propOrder = { "pRedAliq", "pAliqEfet" })
 public class TRed {
 
     @XmlElement(required = true)
-    private String pRedAliq;
+    private BigDecimal pRedAliq;
 
     @XmlElement(required = true)
-    private String pAliqEfet;
+    private BigDecimal pAliqEfet;
+
 }

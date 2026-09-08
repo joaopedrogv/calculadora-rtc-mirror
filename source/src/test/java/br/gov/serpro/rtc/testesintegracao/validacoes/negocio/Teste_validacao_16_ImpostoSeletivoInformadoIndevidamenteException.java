@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import br.gov.serpro.rtc.api.model.input.OperacaoInput;
 import br.gov.serpro.rtc.domain.service.CalculadoraService;
 import br.gov.serpro.rtc.domain.service.exception.ImpostoSeletivoInformadoIndevidamenteException;
+import br.gov.serpro.rtc.util.JsonResourceObjectMapper;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -33,6 +35,8 @@ import br.gov.serpro.rtc.domain.service.exception.ImpostoSeletivoInformadoIndevi
 @ActiveProfiles("testes")
 @Disabled
 class Teste_validacao_16_ImpostoSeletivoInformadoIndevidamenteException {
+
+    private static JsonResourceObjectMapper<OperacaoInput> mapper;
 
     @Autowired
     private MockMvc mockMvc;
@@ -45,11 +49,16 @@ class Teste_validacao_16_ImpostoSeletivoInformadoIndevidamenteException {
 
     private OperacaoInput operacao;
 
+    @BeforeAll
+    static void setup() {
+        mapper = new JsonResourceObjectMapper<>(OperacaoInput.class);
+    }
+
     @BeforeEach
     void beforeEach(
             final @Value("classpath:entradas/validacoes/Teste_validacao_16_ImpostoSeletivoInformadoIndevidamenteException.json") Resource resourceFile)
             throws Exception {
-        operacao = objectMapper.readValue(resourceFile.getInputStream(), OperacaoInput.class);
+        operacao = mapper.loadTestJson(resourceFile);
     }
 
     @Test

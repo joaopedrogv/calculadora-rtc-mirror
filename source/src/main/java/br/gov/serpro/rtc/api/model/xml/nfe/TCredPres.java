@@ -4,8 +4,9 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.nfe;
+
+import java.math.BigDecimal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
@@ -14,25 +15,16 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o detalhamento de crédito presumido de IBS/CBS do
- * documento fiscal Nota Fiscal Eletrônica (NFe), conforme o schema fiscal
- * correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TCredPres", propOrder = {
-    "pCredPres",
-    "vCredPres",
-    "vCredPresCondSus"
-})
+@XmlType(name = "TCredPres", propOrder = { "pCredPres", "vCredPres", "vCredPresCondSus" })
 public class TCredPres {
 
     @XmlElement(required = true)
-    private String pCredPres;
+    private BigDecimal pCredPres;
 
-    private String vCredPres;
+    private BigDecimal vCredPres;
+    private BigDecimal vCredPresCondSus;
 
-    private String vCredPresCondSus;
 }

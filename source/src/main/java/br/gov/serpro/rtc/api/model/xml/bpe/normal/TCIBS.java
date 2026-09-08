@@ -4,7 +4,6 @@
 // Todas as modificações neste arquivo serão perdidas após a recompilação do esquema de origem. 
 //
 
-
 package br.gov.serpro.rtc.api.model.xml.bpe.normal;
 
 import jakarta.xml.bind.annotation.XmlAccessType;
@@ -14,23 +13,10 @@ import jakarta.xml.bind.annotation.XmlType;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Tipo XML que representa o detalhamento de IBS e CBS do documento fiscal
- * Bilhete de Passagem Eletrônico (BPe), conforme o schema fiscal
- * correspondente.
- */
 @Getter
 @Setter
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "TCIBS", propOrder = {
-    "vBC",
-    "gIBSUF",
-    "gIBSMun",
-    "vIBS",
-    "gCBS",
-    "gTribRegular",
-    "gTribCompraGov"
-})
+@XmlType(name = "TCIBS", propOrder = { "vBC", "gIBSUF", "gIBSMun", "vIBS", "gCBS", "gTribRegular", "gTribCompraGov" })
 public class TCIBS {
 
     @XmlElement(required = true)
@@ -55,13 +41,7 @@ public class TCIBS {
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pCBS",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vCBS"
-    })
+    @XmlType(name = "", propOrder = { "pCBS", "gDif", "gDevTrib", "gRed", "vCBS" })
     public static class GCBS {
 
         @XmlElement(required = true)
@@ -75,19 +55,13 @@ public class TCIBS {
 
         @XmlElement(required = true)
         private String vCBS;
-    }
 
+    }
 
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pIBSMun",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vIBSMun"
-    })
+    @XmlType(name = "", propOrder = { "pIBSMun", "gDif", "gDevTrib", "gRed", "vIBSMun" })
     public static class GIBSMun {
 
         @XmlElement(required = true)
@@ -103,17 +77,10 @@ public class TCIBS {
         private String vIBSMun;
     }
 
-
     @Getter
     @Setter
     @XmlAccessorType(XmlAccessType.FIELD)
-    @XmlType(name = "", propOrder = {
-        "pIBSUF",
-        "gDif",
-        "gDevTrib",
-        "gRed",
-        "vIBSUF"
-    })
+    @XmlType(name = "", propOrder = { "pIBSUF", "gDif", "gDevTrib", "gRed", "vIBSUF" })
     public static class GIBSUF {
 
         @XmlElement(required = true)
@@ -127,6 +94,7 @@ public class TCIBS {
 
         @XmlElement(required = true)
         private String vIBSUF;
+
     }
 
 }

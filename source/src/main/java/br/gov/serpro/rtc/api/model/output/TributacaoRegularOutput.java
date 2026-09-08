@@ -10,10 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * Saída da tributação regular, com CST, classificação tributária, base de
- * cálculo, alíquota efetiva e tributo devido.
- */
 @ToString
 @Getter
 @Setter

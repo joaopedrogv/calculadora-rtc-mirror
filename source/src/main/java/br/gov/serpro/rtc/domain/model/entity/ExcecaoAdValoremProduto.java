@@ -15,11 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code EXCECAO_AD_VALOREM_PRODUTO} que registra NCMs
- * excluídos da aplicação de uma alíquota ad valorem de produto durante a
- * vigência.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

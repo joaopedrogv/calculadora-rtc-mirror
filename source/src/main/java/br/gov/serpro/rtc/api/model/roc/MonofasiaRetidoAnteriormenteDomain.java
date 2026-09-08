@@ -22,10 +22,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-/**
- * Representa a tributação monofásica já retida anteriormente, com base em
- * quantidade, alíquotas ad rem e valores considerados de IBS e CBS.
- */
 @Getter
 @Setter
 @Builder

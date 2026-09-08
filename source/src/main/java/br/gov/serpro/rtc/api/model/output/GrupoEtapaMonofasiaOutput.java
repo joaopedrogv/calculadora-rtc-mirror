@@ -14,10 +14,6 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
-/**
- * Saída de uma etapa da tributação monofásica, com quantidade, alíquota ad rem
- * e valor calculado.
- */
 @ToString
 @Getter
 @Setter

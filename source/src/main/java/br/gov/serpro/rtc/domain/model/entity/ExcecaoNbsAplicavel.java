@@ -15,10 +15,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code EXCECAO_NBS_APLICAVEL} que registra exceções de
- * NBS para vínculos de NBS aplicável por classificação tributária.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

@@ -22,10 +22,6 @@ import br.gov.serpro.rtc.domain.model.entity.TratamentoTributario;
 import br.gov.serpro.rtc.domain.service.token.TokenizerService;
 import lombok.RequiredArgsConstructor;
 
-/**
- * Serviço responsável por gerar a memória de cálculo textual de CBS, IBS e
- * Imposto Seletivo com base nas fórmulas e fundamentações aplicáveis.
- */
 @RequiredArgsConstructor
 @Service
 public class MemoriaCalculoService {
@@ -39,11 +35,6 @@ public class MemoriaCalculoService {
 
     public void gerarMemoriaCalculoCbsIbs(TratamentoClassificacaoDTO tratamentoClassificacao, CbsIbsOutput tributo, BigDecimal quantidade, String unidade, LocalDate data) {
         if (memoriaCalculoHabilitada) {
-            // CST sem gIBSCBS (ex: imunidade 410): não há objeto para armazenar a memória de cálculo
-            if (tributo == null) {
-                return;
-            }
-
             FundamentacaoClassificacaoDTO fundamentacaoClassificacao = fundamentacaoClassificacaoService
                     .buscar(tratamentoClassificacao.idClassificacaoTributaria(), data);
             
@@ -52,10 +43,10 @@ public class MemoriaCalculoService {
             
             String norma = fundamentacaoClassificacao.textoCurto();
             String tratamento = tt.getDescricao();
-            String baseCalculo = tributo.getBaseCalculo() != null ? tributo.getBaseCalculo().toString() : "0";
-            String aliquotaAdValorem = tributo.getAliquota() != null ? tributo.getAliquota().toString() : "0";
+            String baseCalculo = tributo.getBaseCalculo().toString();
+            String aliquotaAdValorem = tributo.getAliquota().toString();
             
-            String aliquotaAdRem;
+            String aliquotaAdRem = null;
             if (tributo.getGrupoMonofasia() != null && tributo.getGrupoMonofasia().getTributoMonofasico() != null &&
                     tributo.getGrupoMonofasia().getTributoMonofasico().getAliquotaAdRem() != null) {
                 aliquotaAdRem = tributo.getGrupoMonofasia().getTributoMonofasico().getAliquotaAdRem().toString();
@@ -63,18 +54,30 @@ public class MemoriaCalculoService {
                 aliquotaAdRem = "0";
             }
             
-            String percentualReducao;
+            String percentualReducao = null;
             if (tributo.getGrupoReducao() != null && tributo.getGrupoReducao().getPRedAliq() != null) {
                 percentualReducao = tributo.getGrupoReducao().getPRedAliq().toString();
             } else {
                 percentualReducao = "0";
             }
             
-            String aliquotaDesoneracao = "0";
-            String montanteDesoneracao = "0";
+            String aliquotaDesoneracao = null;
+            String montanteDesoneracao = null;
+            // if (tributo.getTributacaoRegular() != null && tributo.getTributacaoRegular().getAliquotaEfetiva() != null &&
+            //     tributo.getTributacaoRegular().getMontanteDesonerado() != null) {
+            //     aliquotaDesoneracao = tributo.getTributacaoRegular()
+            //         .getAliquotaEfetiva()
+            //         .multiply(BigDecimal.valueOf(100))
+            //         .setScale(2, RoundingMode.HALF_UP)
+            //         .toString();
+            //     montanteDesoneracao = tributo.getTributacaoRegular().getMontanteDesonerado().toString();
+            // } else {
+            //     aliquotaDesoneracao = "0";
+            //     montanteDesoneracao = "0";
+            // }
             
-            String percentualDiferimento;
-            String valorDiferimento;
+            String percentualDiferimento = null;
+            String valorDiferimento = null;
             if (tributo.getGrupoDiferimento() != null && tributo.getGrupoDiferimento().getPDif() != null &&
                     tributo.getGrupoDiferimento().getVDif() != null) {
                 percentualDiferimento = tributo.getGrupoDiferimento().getPDif().toString();
@@ -89,7 +92,7 @@ public class MemoriaCalculoService {
                     Map.entry("base_calculo", defaultString(baseCalculo)),
                     Map.entry("aliquota_ad_valorem", defaultString(aliquotaAdValorem)),
                     Map.entry("aliquota_ad_rem", defaultString(aliquotaAdRem)),
-                    Map.entry("quantidade", defaultString(quantidade != null ? quantidade.toString() : "0")),
+                    Map.entry("quantidade", defaultString(quantidade.toString())),
                     Map.entry("unidade", defaultString(unidade)),
                     
                     Map.entry("percentual_reducao", defaultString(percentualReducao)),

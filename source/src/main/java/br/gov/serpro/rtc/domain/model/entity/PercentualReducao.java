@@ -16,10 +16,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-/**
- * Entidade JPA da tabela {@code PERCENTUAL_REDUCAO} que armazena percentuais de
- * redução por classificação tributária e tributo, com vigência.
- */
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 @Data
 @Entity

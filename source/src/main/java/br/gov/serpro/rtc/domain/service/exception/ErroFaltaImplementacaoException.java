@@ -3,10 +3,6 @@
  */
 package br.gov.serpro.rtc.domain.service.exception;
 
-/**
- * Exceção lançada quando uma regra ou tratamento tributário ainda não possui
- * implementação na calculadora.
- */
 public class ErroFaltaImplementacaoException extends ValidacaoException {
 
     private static final long serialVersionUID = 529876772972113L;
