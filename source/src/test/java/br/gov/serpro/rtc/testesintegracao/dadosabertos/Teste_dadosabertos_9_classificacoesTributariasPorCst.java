@@ -21,7 +21,7 @@ import org.springframework.test.web.servlet.MockMvc;
 @AutoConfigureMockMvc
 @TestPropertySource(locations = "classpath:application-testes.yml")
 @ActiveProfiles("testes")
-class Teste_dadosabertos_classificacoesTributariasPorCst {
+class Teste_dadosabertos_9_classificacoesTributariasPorCst {
 
     @Autowired
     private MockMvc mockMvc;
