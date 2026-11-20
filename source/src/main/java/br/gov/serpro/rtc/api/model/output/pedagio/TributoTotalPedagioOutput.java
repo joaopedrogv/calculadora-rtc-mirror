@@ -11,12 +11,13 @@ import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import tools.jackson.databind.annotation.JsonSerialize;
 
 import br.gov.serpro.rtc.api.model.SerializationVisibility;
 import br.gov.serpro.rtc.config.serializer.BigDecimalTDec1302Serializer;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.extern.jackson.Jacksonized;
 import lombok.Getter;
 
 /**
@@ -25,6 +26,7 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@Jacksonized
 @JsonInclude(Include.NON_NULL)
 public final class TributoTotalPedagioOutput implements SerializationVisibility {
 

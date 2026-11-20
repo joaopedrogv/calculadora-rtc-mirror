@@ -23,7 +23,7 @@ import br.gov.serpro.rtc.api.model.xml.nf3e.InfNF3E.NFdet.Det;
 import br.gov.serpro.rtc.api.model.xml.nf3e.InfNF3E.NFdet.Det.DetItem.Imposto;
 import br.gov.serpro.rtc.api.model.xml.nf3e.InfNF3E.Total;
 import br.gov.serpro.rtc.api.model.xml.nf3e.TCompraGovReduzido;
-import br.gov.serpro.rtc.core.util.ArredondamentoUtils;
+import br.gov.serpro.rtc.shared.util.ArredondamentoUtils;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;

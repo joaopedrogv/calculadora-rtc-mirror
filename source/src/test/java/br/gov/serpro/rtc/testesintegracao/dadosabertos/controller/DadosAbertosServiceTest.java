@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import br.gov.serpro.rtc.api.model.output.dadosabertos.NomenclaturaDadosAbertosOutput;
 import br.gov.serpro.rtc.domain.service.dadosabertos.DadosAbertosService;
 import br.gov.serpro.rtc.domain.service.exception.AliquotaNaoEncontradaException;
 
@@ -253,6 +252,27 @@ class DadosAbertosServiceTest {
         assertThat(grupos.get(0).getOrdem()).isEqualTo(1);
         // codigo normalizado casa com o siglaDfe consumido pelos demais endpoints
         assertThat(grupos.get(0).getTipos().get(0).getCodigo()).isEqualTo(SIGLA_DFE);
+        // suportado e permiteNcmZero sempre preenchidos (nunca nulos)
+        var tipos = grupos.stream().flatMap(g -> g.getTipos().stream()).toList();
+        assertThat(tipos).allSatisfy(tipo -> {
+            assertThat(tipo.getSuportado()).isNotNull();
+            assertThat(tipo.getPermiteNcmZero()).isNotNull();
+        });
+        // NF-e: suportada e com NCM zero; CT-e: suportado sem NCM zero
+        assertThat(tipos).filteredOn(t -> "NFE".equals(t.getCodigo())).singleElement()
+            .satisfies(t -> {
+                assertThat(t.getSuportado()).isTrue();
+                assertThat(t.getPermiteNcmZero()).isTrue();
+            });
+        assertThat(tipos).filteredOn(t -> "CTE".equals(t.getCodigo())).singleElement()
+            .satisfies(t -> {
+                assertThat(t.getSuportado()).isTrue();
+                assertThat(t.getPermiteNcmZero()).isFalse();
+            });
+        // Tipos sem tratamento pela calculadora (REG-038)
+        assertThat(tipos).filteredOn(t -> List.of("NFEABI", "DERE", "DIR", "DUIMP").contains(t.getCodigo()))
+            .hasSize(4)
+            .allSatisfy(t -> assertThat(t.getSuportado()).isFalse());
     }
 
     @Test

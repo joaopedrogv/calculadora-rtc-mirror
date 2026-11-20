@@ -3,6 +3,8 @@
  */
 package br.gov.serpro.rtc.testesintegracao.dadosabertos;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -10,15 +12,20 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
+
+import com.jayway.jsonpath.JsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -100,5 +107,50 @@ class Teste_dadosabertos_14_tiposDfeAgrupados {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].tipos[0].descricao").doesNotExist());
+    }
+
+    @Test
+    @DisplayName("NF-e é suportada e permite NCM zero; CT-e é suportado sem NCM zero")
+    void teste_dfeGrupos_suportadoEPermiteNcmZero_tiposSuportados() throws Exception {
+        mockMvc.perform(get(URI)
+                .param("data", DATA_VIGENTE)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[*].tipos[?(@.codigo == 'NFE')].suportado", contains(true)))
+                .andExpect(jsonPath("$[*].tipos[?(@.codigo == 'NFE')].permiteNcmZero", contains(true)))
+                .andExpect(jsonPath("$[*].tipos[?(@.codigo == 'NFCE')].permiteNcmZero", contains(true)))
+                .andExpect(jsonPath("$[*].tipos[?(@.codigo == 'CTE')].suportado", contains(true)))
+                .andExpect(jsonPath("$[*].tipos[?(@.codigo == 'CTE')].permiteNcmZero", contains(false)));
+    }
+
+    @Test
+    @DisplayName("NF-e ABI, DERE, DIR e Duimp (grupo 5) não são suportados pela calculadora")
+    void teste_dfeGrupos_tiposNaoSuportados_grupo5() throws Exception {
+        String grupo5 = "$[?(@.id == '5')].tipos";
+        mockMvc.perform(get(URI)
+                .param("data", DATA_VIGENTE)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(grupo5 + "[?(@.codigo == 'NFEABI')].suportado", contains(false)))
+                .andExpect(jsonPath(grupo5 + "[?(@.codigo == 'DERE')].suportado", contains(false)))
+                .andExpect(jsonPath(grupo5 + "[?(@.codigo == 'DIR')].suportado", contains(false)))
+                .andExpect(jsonPath(grupo5 + "[?(@.codigo == 'DUIMP')].suportado", contains(false)));
+    }
+
+    @Test
+    @DisplayName("Todo tipo de todos os grupos traz suportado e permiteNcmZero preenchidos")
+    void teste_dfeGrupos_flagsSemprePresentes() throws Exception {
+        String json = mockMvc.perform(get(URI)
+                .param("data", DATA_VIGENTE)
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+
+        List<Map<String, Object>> tipos = JsonPath.read(json, "$[*].tipos[*]");
+        assertThat(tipos).isNotEmpty().allSatisfy(tipo -> {
+            assertThat(tipo).containsKeys("suportado", "permiteNcmZero");
+            assertThat(tipo.get("suportado")).isInstanceOf(Boolean.class);
+            assertThat(tipo.get("permiteNcmZero")).isInstanceOf(Boolean.class);
+        });
     }
 }

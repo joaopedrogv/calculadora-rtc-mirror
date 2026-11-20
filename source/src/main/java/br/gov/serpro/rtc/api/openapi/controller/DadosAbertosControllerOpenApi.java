@@ -2347,7 +2347,9 @@ public interface DadosAbertosControllerOpenApi {
 
     @Operation(summary = "Tipos de DFe agrupados",
         description = "Obtém os tipos de Documento Fiscal Eletrônico (DFe) vigentes, agrupados pela sua categoria, "
-            + "para a seleção do tipo de documento. O campo codigo de cada tipo é a sigla usada como siglaDfe nos demais endpoints")
+            + "para a seleção do tipo de documento. O campo codigo de cada tipo é a sigla usada como siglaDfe nos demais endpoints. "
+            + "Cada tipo informa ainda se é tratado pela calculadora (suportado; false = o cálculo é rejeitado com REG-038) "
+            + "e se admite NCM zerado nos itens (permiteNcmZero)")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Consulta realizada com sucesso", content = {
             @Content(
@@ -2362,8 +2364,8 @@ public interface DadosAbertosControllerOpenApi {
                         "titulo": "MERCADORIAS",
                         "ordem": 1,
                         "tipos": [
-                          { "codigo": "NFE", "titulo": "Nota Fiscal Eletrônica", "modelo": "55", "ordem": 1 },
-                          { "codigo": "NFCE", "titulo": "Nota Fiscal de Consumidor Eletrônica", "modelo": "65", "ordem": 2 }
+                          { "codigo": "NFE", "titulo": "Nota Fiscal Eletrônica", "modelo": "55", "ordem": 1, "suportado": true, "permiteNcmZero": true },
+                          { "codigo": "NFCE", "titulo": "Nota Fiscal de Consumidor Eletrônica", "modelo": "65", "ordem": 2, "suportado": true, "permiteNcmZero": true }
                         ]
                       }
                     ]

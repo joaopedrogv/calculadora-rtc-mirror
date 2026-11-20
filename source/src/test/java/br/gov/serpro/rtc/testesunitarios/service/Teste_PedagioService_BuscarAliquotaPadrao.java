@@ -1,5 +1,6 @@
 package br.gov.serpro.rtc.testesunitarios.service;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.eq;
@@ -31,8 +32,8 @@ import br.gov.serpro.rtc.domain.service.pedagio.PedagioService;
  * Comportamento:
  * 1. Busca AliquotaResultadoDTO via AliquotaPadraoService
  * 2. Obtém valorAplicavel() que já considera a formaAplicacao (SUBSTITUICAO, ACRESCIMO ou DECRESCIMO)
- * 3. Divide por 100 para converter de percentual para decimal (12% → 0.12)
- * 4. Aplica escala de 8 casas decimais com HALF_UP
+ * 3. Converte de percentual para fração (12% → 0.12) de forma exata, sem arredondar: a conversão
+ *    só desloca a vírgula, e nenhuma casa da alíquota se perde
  */
 @ExtendWith(MockitoExtension.class)
 class Teste_PedagioService_BuscarAliquotaPadrao {
@@ -80,7 +81,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 12 / 100 = 0.12
-        assertEquals(new BigDecimal("0.12000000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0.12");
     }
 
     @Test
@@ -111,7 +112,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 17.5 / 100 = 0.175
-        assertEquals(new BigDecimal("0.17500000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0.175");
     }
 
     @Test
@@ -142,7 +143,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 5 / 100 = 0.05
-        assertEquals(new BigDecimal("0.05000000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0.05");
     }
 
     @Test
@@ -174,7 +175,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 12 / 100 = 0.12
-        assertEquals(new BigDecimal("0.12000000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0.12");
     }
 
     @Test
@@ -206,7 +207,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 12 / 100 = 0.12
-        assertEquals(new BigDecimal("0.12000000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0.12");
     }
 
     @Test
@@ -236,13 +237,13 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
         // Assert
         assertNotNull(resultado);
         // 0 / 100 = 0.00
-        assertEquals(new BigDecimal("0.00000000"), resultado);
+        assertThat(resultado).isEqualByComparingTo("0");
     }
 
     @Test
     void teste_BuscarAliquotaPadrao_ValorComMuitasDecimais() {
-        // Cenário: Valor com muitas casas decimais para testar arredondamento
-        // 12.34567890123 / 100 = 0.1234567890123 → arredonda para 0.12345679
+        // Cenário: valor com muitas casas decimais; a conversão é exata e preserva todas
+        // 12.34567890123 / 100 = 0.1234567890123
         AliquotaResultadoDTO aliquotaDTO = new AliquotaResultadoDTO(
                 BigDecimal.ZERO,
                 new BigDecimal("12.34567890123"),
@@ -266,14 +267,13 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
 
         // Assert
         assertNotNull(resultado);
-        assertEquals(new BigDecimal("0.12345679"), resultado);
-        assertEquals(8, resultado.scale()); // Verifica que tem exatamente 8 casas decimais
+        assertEquals(new BigDecimal("0.1234567890123"), resultado);
     }
 
     @Test
-    void teste_BuscarAliquotaPadrao_ArredondamentoHalfUp() {
-        // Cenário: Testa arredondamento HALF_UP na 8ª casa decimal
-        // 12.34123456785 / 100 = 0.1234123456785 → arredonda para 0.12341235
+    void teste_BuscarAliquotaPadrao_ConversaoExataSemArredondamento() {
+        // Cenário: a alíquota não é arredondada na conversão, nem na oitava casa
+        // 12.34123456785 / 100 = 0.1234123456785
         AliquotaResultadoDTO aliquotaDTO = new AliquotaResultadoDTO(
                 BigDecimal.ZERO,
                 new BigDecimal("12.34123456785"),
@@ -297,8 +297,7 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
 
         // Assert
         assertNotNull(resultado);
-        // Última casa arredonda de 6785 para 35 (HALF_UP)
-        assertEquals(new BigDecimal("0.12341235"), resultado);
+        assertEquals(new BigDecimal("0.1234123456785"), resultado);
     }
 
     @Test
@@ -344,9 +343,9 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
 
         // Assert
         // 10 / 100 = 0.10
-        assertEquals(new BigDecimal("0.10000000"), resultado2025);
+        assertThat(resultado2025).isEqualByComparingTo("0.1");
         // 12 / 100 = 0.12
-        assertEquals(new BigDecimal("0.12000000"), resultado2026);
+        assertThat(resultado2026).isEqualByComparingTo("0.12");
     }
 
     @Test
@@ -410,10 +409,10 @@ class Teste_PedagioService_BuscarAliquotaPadrao {
 
         // Assert
         // 12 / 100 = 0.12
-        assertEquals(new BigDecimal("0.12000000"), valorCBS);
+        assertThat(valorCBS).isEqualByComparingTo("0.12");
         // 17.5 / 100 = 0.175
-        assertEquals(new BigDecimal("0.17500000"), valorIBSEstadual);
+        assertThat(valorIBSEstadual).isEqualByComparingTo("0.175");
         // 5 / 100 = 0.05
-        assertEquals(new BigDecimal("0.05000000"), valorIBSMunicipal);
+        assertThat(valorIBSMunicipal).isEqualByComparingTo("0.05");
     }
 }

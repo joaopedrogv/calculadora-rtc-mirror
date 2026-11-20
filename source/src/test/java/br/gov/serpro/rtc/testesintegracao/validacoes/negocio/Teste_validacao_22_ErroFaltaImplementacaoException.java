@@ -3,16 +3,18 @@
 */
 package br.gov.serpro.rtc.testesintegracao.validacoes.negocio;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.Resource;
 import org.springframework.http.MediaType;
@@ -20,13 +22,13 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
+import br.gov.serpro.rtc.api.exceptionhandler.enumeration.ProblemType;
 import br.gov.serpro.rtc.api.model.input.OperacaoInput;
+import br.gov.serpro.rtc.domain.model.enumeration.EstadoItemEnum;
 import br.gov.serpro.rtc.domain.service.CalculadoraService;
 import br.gov.serpro.rtc.domain.service.ObservabilidadeService;
-import br.gov.serpro.rtc.domain.service.collector.ErrosCalculoException;
-import br.gov.serpro.rtc.domain.service.exception.ErroFaltaImplementacaoException;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -47,6 +49,8 @@ class Teste_validacao_22_ErroFaltaImplementacaoException {
     private ObservabilidadeService observabilidadeService;
     
     private OperacaoInput operacao; 
+    
+    private static final ProblemType ERRO = ProblemType.ERRO_FALTA_IMPLEMENTACAO;
 
     @BeforeEach
     void beforeEach(
@@ -56,62 +60,49 @@ class Teste_validacao_22_ErroFaltaImplementacaoException {
     }
 
     @Test
-    void teste_service_CalcularTributos() {
+    @DisplayName("Deve lançar ErroFaltaImplementacaoException ao calcular tributos no serviço")
+    void deveLancarErroFaltaImplementacaoNoServico() {
         assertThatThrownBy(() -> calculadoraService.calcularTributos(operacao))
-                .isExactlyInstanceOf(ErroFaltaImplementacaoException.class);
+                .isExactlyInstanceOf(ERRO.getClasseErro());
     }
 
     @Test
-    void teste_service_CalcularTributos_NFeAbi() {
-        operacao.setTpDoc(77);
-        assertThatThrownBy(() -> calculadoraService.calcularTributos(operacao))
-                .isExactlyInstanceOf(ErroFaltaImplementacaoException.class);
-    }
-
-    @Test
-    void teste_service_CalcularTributos_Dere() {
-        operacao.setTpDoc(94);
-        assertThatThrownBy(() -> calculadoraService.calcularTributos(operacao))
-                .isExactlyInstanceOf(ErroFaltaImplementacaoException.class);
-    }
-
-    @Test
-    void teste_controller_CalcularTributos() throws Exception {
+    @DisplayName("Deve retornar erro ao calcular tributos na API")
+    void deveRetornarErroNoController() throws Exception {
         final String jsonContent = objectMapper.writeValueAsString(operacao);
         mockMvc.perform(post("/calculadora/regime-geral")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
                 .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.title").value("Classificação tributária em desenvolvimento"));
+                .andExpect(jsonPath("$.title").value(ERRO.getTitulo()));
+    }
+    
+    @Test
+    @DisplayName("Deve processar operação com estado NAO_IMPLEMENTADO no serviço de observabilidade")
+    void deveProcessarComEstadoNaoImplementadoNoServicoObservabilidade() {
+    	final var roc = observabilidadeService.processarOperacao(operacao, "http://localhost:8080");
+
+        assertThat(roc).isNotNull();
+
+        final var objetos = roc.getObjetos();
+        assertThat(objetos).isNotNull().hasSize(1);
+        assertThat(objetos.get(0).getEstadoItem()).hasToString(EstadoItemEnum.NAO_IMPLEMENTADO.name());
+        assertThat(objetos.get(0).getErros()).isNotNull().hasSize(1)
+        	.filteredOn(erro -> erro.code().equals(ERRO.getCodigoErro().codigo())).isNotEmpty()
+        	.filteredOn(erro -> erro.title().equals(ERRO.getTitulo())).isNotEmpty();        
     }
 
     @Test
-    void teste_controller_CalcularTributos_NFeAbi() throws Exception {
-        operacao.setTpDoc(77);
-        final String jsonContent = objectMapper.writeValueAsString(operacao);
-        mockMvc.perform(post("/calculadora/regime-geral")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonContent))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.title").value("Classificação tributária em desenvolvimento"));
-    }
-
-    @Test
-    void teste_observabilidade_CalcularTributos_NFeAbi() {
-        operacao.setTpDoc(77);
-        assertThatThrownBy(() -> observabilidadeService.processarOperacao(operacao, "http://localhost:8080"))
-                .isExactlyInstanceOf(ErrosCalculoException.class);
-    }
-
-    @Test
-    void teste_controllerObservabilidade_CalcularTributos_NFeAbi() throws Exception {
-        operacao.setTpDoc(77);
+    @DisplayName("Deve retornar operação com estado NAO_IMPLEMENTADO no controller de observabilidade")
+    void deveRetornarComEstadoNaoImplementadoNoControllerObservabilidade() throws Exception {
         final String jsonContent = objectMapper.writeValueAsString(operacao);
         mockMvc.perform(post("/calculadora/observabilidade/regime-geral")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(jsonContent))
-                .andExpect(status().is4xxClientError())
-                .andExpect(jsonPath("$.errors[0].code").value("CAL-007"));
+                .andExpect(status().is2xxSuccessful())
+                .andExpect(jsonPath("$.objetos[0].estadoItem").value(EstadoItemEnum.NAO_IMPLEMENTADO.name()))
+                .andExpect(jsonPath("$.objetos[0].erros[0].code").value(ERRO.getCodigoErro().codigo()))
+                .andExpect(jsonPath("$.objetos[0].erros[0].title").value(ERRO.getTitulo()));        
     }
 
 }

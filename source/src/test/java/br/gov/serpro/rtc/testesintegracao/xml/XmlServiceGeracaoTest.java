@@ -14,7 +14,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import br.gov.serpro.rtc.api.model.roc.ROCDomain;
 import br.gov.serpro.rtc.api.model.xml.enumeration.TipoDocumento;

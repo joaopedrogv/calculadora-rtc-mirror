@@ -27,7 +27,10 @@ public interface GrupoDfeRepository extends JpaRepository<GrupoDfe, Long> {
      * de documento. Considera apenas grupos e tipos vigentes na data.
      *
      * <p>Cada linha traz: {@code grupo_id, grupo_titulo, tipo_sigla,
-     * tipo_titulo, tipo_modelo}.
+     * tipo_titulo, tipo_modelo, tipo_suportado, tipo_permite_ncm_zero}.
+     * As duas últimas colunas são as flags
+     * {@code TPDF_B_POSSUI_TRATAMENTO_CALCULADORA} e
+     * {@code TPDF_B_PERMITE_NCM_ZERO} (inteiros 0/1 no SQLite).
      */
     @NativeQuery(value = """
             SELECT
@@ -35,7 +38,9 @@ public interface GrupoDfeRepository extends JpaRepository<GrupoDfe, Long> {
                 g.GRDF_DESCRICAO AS grupo_titulo,
                 t.TPDF_SIGLA     AS tipo_sigla,
                 t.TPDF_DESCRICAO AS tipo_titulo,
-                t.TPDF_TIPO      AS tipo_modelo
+                t.TPDF_TIPO      AS tipo_modelo,
+                t.TPDF_B_POSSUI_TRATAMENTO_CALCULADORA AS tipo_suportado,
+                t.TPDF_B_PERMITE_NCM_ZERO              AS tipo_permite_ncm_zero
             FROM TIPO_DFE t
             JOIN GRUPO_DFE g ON t.TPDF_GRDF_ID = g.GRDF_ID
             WHERE :data BETWEEN t.TPDF_INICIO_VIGENCIA AND COALESCE(t.TPDF_FIM_VIGENCIA, :data)

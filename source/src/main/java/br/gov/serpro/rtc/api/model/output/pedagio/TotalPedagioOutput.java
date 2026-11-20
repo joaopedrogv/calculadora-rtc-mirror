@@ -16,6 +16,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import br.gov.serpro.rtc.api.model.SerializationVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
+import lombok.extern.jackson.Jacksonized;
 import lombok.Value;
 
 /**
@@ -25,6 +26,7 @@ import lombok.Value;
  */
 @Value
 @Builder
+@Jacksonized
 @JsonInclude(Include.NON_NULL)
 public final class TotalPedagioOutput implements SerializationVisibility {
 

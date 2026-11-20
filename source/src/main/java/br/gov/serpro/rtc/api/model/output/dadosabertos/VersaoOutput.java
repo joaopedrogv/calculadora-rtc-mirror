@@ -11,14 +11,23 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.extern.jackson.Jacksonized;
 
 /**
  * Saída de dados abertos com as versões publicadas da aplicação, do banco de
  * dados e do ambiente.
+ *
+ * <p>É usada em duas direções: como resposta de {@code dados-abertos/versao}
+ * desta instalação e como alvo da leitura da versão REMOTA, consultada na
+ * mesma rota da instalação online pelo comparador do perfil offline
+ * ({@code VersaoOfflineService}). Os campos são {@code final} e a classe não
+ * tem construtor público: é o {@code @Jacksonized} que faz o Jackson montar o
+ * objeto pelo builder. Sem ele a leitura falha com "Type definition error".
  */
 @Getter
 @Setter
 @Builder
+@Jacksonized
 @JsonInclude(Include.NON_NULL)
 public class VersaoOutput implements SerializationVisibility {
 

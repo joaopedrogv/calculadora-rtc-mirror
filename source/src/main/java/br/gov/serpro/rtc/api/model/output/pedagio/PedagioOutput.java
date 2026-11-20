@@ -9,6 +9,7 @@ import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import lombok.extern.jackson.Jacksonized;
 
 import br.gov.serpro.rtc.api.model.SerializationVisibility;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Setter
 @Getter
 @Builder
+@Jacksonized
 @JsonInclude(Include.NON_NULL)
 public final class PedagioOutput implements SerializationVisibility {
 

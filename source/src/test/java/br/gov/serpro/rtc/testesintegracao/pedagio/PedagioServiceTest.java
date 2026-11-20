@@ -11,7 +11,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import tools.jackson.databind.ObjectMapper;
 
 import br.gov.serpro.rtc.api.model.input.pedagio.PedagioInput;
 import br.gov.serpro.rtc.domain.service.pedagio.PedagioService;

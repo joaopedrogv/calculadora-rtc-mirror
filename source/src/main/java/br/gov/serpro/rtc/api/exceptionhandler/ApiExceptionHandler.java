@@ -22,7 +22,6 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import br.gov.serpro.rtc.api.exceptionhandler.enumeration.ProblemType;
 import br.gov.serpro.rtc.domain.service.exception.CampoInvalidoException;
-import br.gov.serpro.rtc.domain.service.exception.CaptchaException;
 import br.gov.serpro.rtc.domain.service.exception.EntidadeNaoEncontradaException;
 import br.gov.serpro.rtc.domain.service.exception.ErroInternoSistemaException;
 import br.gov.serpro.rtc.domain.service.exception.EstruturaInconsistenteException;
@@ -105,17 +104,6 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         return handleExceptionInternal(ex, problemDetail, new HttpHeaders(), status, request);
     }
 
-    @ExceptionHandler(CaptchaException.class)
-    ResponseEntity<Object> handleCaptchaException(CaptchaException ex, WebRequest request) {
-        HttpStatus status = HttpStatus.BAD_REQUEST;
-        
-        // Captcha - log com nível WARN (pode ser tentativa maliciosa)
-        log.warn("Captcha inválido: {} | URI: {}", ex.getMessage(), request.getDescription(false));
-        
-        ProblemDetail problemDetail = createProblem(ex, status);
-        return handleExceptionInternal(ex, problemDetail, new HttpHeaders(), status, request);
-    }
-    
     @ExceptionHandler(CampoInvalidoException.class)
     ResponseEntity<Object> handleCampoInvalidoException(CampoInvalidoException ex, WebRequest request) {
         HttpStatus status = HttpStatus.BAD_REQUEST;

@@ -539,7 +539,8 @@ public class DadosAbertosService {
         if (value instanceof BigDecimal) {
             return (BigDecimal) value;
         } else if (value instanceof Float) {
-            return BigDecimal.valueOf(((Float) value).doubleValue());
+            // pelo texto do número, sem passar por double: 0.365f viraria 0.36500000953674316
+            return new BigDecimal(value.toString());
         } else if (value instanceof Double) {
             return BigDecimal.valueOf((Double) value);
         } else if (value instanceof Integer) {
@@ -831,6 +832,8 @@ public class DadosAbertosService {
             String tipoSigla = (String) row[2];
             String tipoTitulo = (String) row[3];
             String modelo = row[4] != null ? String.valueOf(((Number) row[4]).intValue()) : null;
+            boolean suportado = flagSqlite(row[5], true);
+            boolean permiteNcmZero = flagSqlite(row[6], false);
 
             GrupoDfeDadosAbertosOutput grupo = gruposPorId.computeIfAbsent(grupoId, k ->
                 GrupoDfeDadosAbertosOutput.builder()
@@ -846,6 +849,8 @@ public class DadosAbertosService {
                     .titulo(tipoTitulo)
                     .modelo(modelo)
                     .ordem(grupo.getTipos().size() + 1)
+                    .suportado(suportado)
+                    .permiteNcmZero(permiteNcmZero)
                     .build()
             );
         }
@@ -856,6 +861,23 @@ public class DadosAbertosService {
         }
 
         return new ArrayList<>(gruposPorId.values());
+    }
+
+    /**
+     * Converte uma flag booleana lida por native query: o SQLite devolve
+     * inteiros 0/1 (ou {@link Boolean}, conforme o driver).
+     *
+     * @param valor valor bruto da coluna
+     * @param padrao valor usado quando a coluna vier nula (default da coluna)
+     */
+    private static boolean flagSqlite(Object valor, boolean padrao) {
+        if (valor instanceof Boolean b) {
+            return b;
+        }
+        if (valor instanceof Number n) {
+            return n.intValue() != 0;
+        }
+        return padrao;
     }
 
     public NomenclaturaDadosAbertosOutput consultarNomenclatura(String siglaDfe, String cClassTrib, LocalDate data) {

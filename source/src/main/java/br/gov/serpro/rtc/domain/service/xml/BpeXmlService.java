@@ -20,7 +20,7 @@ import br.gov.serpro.rtc.api.model.xml.bpe.normal.TCompraGovReduzido;
 import br.gov.serpro.rtc.api.model.xml.bpe.normal.TTribBPe;
 import br.gov.serpro.rtc.api.model.xml.bpe.normal.InfBPe.Ide;
 import br.gov.serpro.rtc.api.model.xml.bpe.normal.InfBPe.Imp;
-import br.gov.serpro.rtc.core.util.ArredondamentoUtils;
+import br.gov.serpro.rtc.shared.util.ArredondamentoUtils;
 import jakarta.xml.bind.JAXBContext;
 import jakarta.xml.bind.JAXBException;
 import jakarta.xml.bind.Marshaller;

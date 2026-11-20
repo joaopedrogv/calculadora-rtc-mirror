@@ -15,7 +15,9 @@ import lombok.Setter;
 /**
  * Saída de dados abertos que representa um tipo de documento fiscal eletrônico
  * (DFe) selecionável, com seu código (sigla normalizada), título, modelo fiscal
- * e ordem de exibição dentro do grupo.
+ * e ordem de exibição dentro do grupo, além das indicações de tratamento pela
+ * calculadora ({@code suportado}) e de admissão de NCM zerado
+ * ({@code permiteNcmZero}).
  */
 @Getter
 @Setter
@@ -37,5 +39,12 @@ public class TipoDfeDadosAbertosOutput implements SerializationVisibility {
 
     @Schema(name = "ordem", description = "Ordem de exibição do tipo dentro do grupo", example = "1")
     private Integer ordem;
+
+    @Schema(name = "suportado", description = "Indica se a calculadora trata este tipo de documento nos endpoints de cálculo. "
+        + "false = o cálculo é rejeitado com o erro REG-038 (tipo de documento fiscal não tratado).", example = "true")
+    private Boolean suportado;
+
+    @Schema(name = "permiteNcmZero", description = "Indica se o documento admite NCM zerado (00 ou 00000000) nos itens.", example = "true")
+    private Boolean permiteNcmZero;
 
 }

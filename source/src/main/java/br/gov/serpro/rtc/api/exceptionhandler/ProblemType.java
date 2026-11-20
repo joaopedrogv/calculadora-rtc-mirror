@@ -19,7 +19,6 @@ import br.gov.serpro.rtc.domain.service.exception.BaseCalculoInconsistenteExcept
 import br.gov.serpro.rtc.domain.service.exception.BaseCalculoMenorBaseCalculoImpostoSeletivoException;
 import br.gov.serpro.rtc.domain.service.exception.BaseCalculoNaoInformadaException;
 import br.gov.serpro.rtc.domain.service.exception.CampoInvalidoException;
-import br.gov.serpro.rtc.domain.service.exception.CaptchaException;
 import br.gov.serpro.rtc.domain.service.exception.ClassificacaoTributariaNaoEncontradaException;
 import br.gov.serpro.rtc.domain.service.exception.ClassificacaoTributariaNaoVinculadaSituacaoTributariaException;
 import br.gov.serpro.rtc.domain.service.exception.DataFatoGeradorNaoInformadaException;
@@ -146,8 +145,6 @@ public enum ProblemType {
 
     ERRO_NEGOCIO(NegocioException.class, "Violação de regra de negócio", "erro-negocio"),
     
-    ERRO_CAPTCHA(CaptchaException.class, "Erro de Captcha", "erro-captcha"),
-
     METHOD_ARGUMENT_TYPE_MISMATCH(MethodArgumentTypeMismatchException.class, "Tipo de argumento inválido", "tipo-argumento-invalido"),
     
     ERRO_LEITURA_MENSAGEM(HttpMessageNotReadableException.class, "Erro na leitura da mensagem", "erro-leitura-mensagem"),
